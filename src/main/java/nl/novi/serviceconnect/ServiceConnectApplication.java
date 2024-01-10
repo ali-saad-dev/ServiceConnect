@@ -1,4 +1,4 @@
-package com.example.serviceconnect;
+package nl.novi.serviceconnect;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
