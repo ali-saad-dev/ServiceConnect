@@ -6,6 +6,7 @@ import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import java.util.List;
 
 public interface IServiceService {
-    ServiceInputDto createService(ServiceInputDto serviceInputDto);
+    ServiceInputDto CreateService(ServiceInputDto serviceInputDto);
     List<ServiceOutputDto> GetAllService();
 }
+
