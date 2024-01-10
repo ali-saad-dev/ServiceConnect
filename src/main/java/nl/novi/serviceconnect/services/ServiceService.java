@@ -18,7 +18,7 @@ public class ServiceService implements IServiceService {
     }
 
     @Override
-    public ServiceInputDto createService(ServiceInputDto serviceInputDto) {
+    public ServiceInputDto CreateService(ServiceInputDto serviceInputDto) {
         repo.save(Mapper.fromDtoToService(serviceInputDto));
         return serviceInputDto;
     }
