@@ -12,6 +12,22 @@ public class ServiceInputDto {
     public String name;
     public String description;
     @Positive
-    public double price;
+    public Double price;
     public ServiceState state;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public ServiceState getState() {
+        return state;
+    }
 }

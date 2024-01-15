@@ -2,10 +2,8 @@ package nl.novi.serviceconnect.dtos;
 
 import nl.novi.serviceconnect.models.ServiceState;
 
-public class ServiceOutputDto {
+public class ServiceRequestOutputDto {
     public Long id;
-    public String name;
-    public String description;
-    public Double price;
+    public String message;
     public ServiceState state;
 }
