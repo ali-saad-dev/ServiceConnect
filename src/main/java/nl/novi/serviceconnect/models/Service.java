@@ -2,6 +2,8 @@ package nl.novi.serviceconnect.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="services")
 public class Service {
@@ -12,13 +14,14 @@ public class Service {
     private String name;
     private String description;
     @Column(name="price", length = 128)
-    private double price;
+    private Double price;
     @Enumerated(EnumType.STRING)
     private ServiceState state;
 
-    public Long getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "service")
+    private List<ServiceRequest> serviceRequests;
+
+    public Long getId() { return id; }
 
     public String getName() {
         return name;

@@ -13,58 +13,84 @@ import java.util.Optional;
 
 @Service
 public class ServiceService implements IServiceService {
-    private final ServiceRepository repo;
+    private final ServiceRepository repository;
 
     public ServiceService(ServiceRepository repo) {
-        this.repo = repo;
+        this.repository = repo;
     }
 
     @Override
-    public ServiceInputDto CreateService(ServiceInputDto serviceInputDto) {
-        repo.save(Mapper.fromDtoToService(serviceInputDto));
+    public ServiceInputDto createService(ServiceInputDto serviceInputDto) {
+        repository.save(Mapper.fromDtoToService(serviceInputDto));
         return serviceInputDto;
     }
 
     @Override
-    public List<ServiceOutputDto> GetAllService() {
-        List<nl.novi.serviceconnect.models.Service> serviceList = repo.findAll();
+    public List<ServiceOutputDto> getAllService() {
+        List<nl.novi.serviceconnect.models.Service> serviceList = repository.findAll();
         List<ServiceOutputDto> serviceOutputDtos = new ArrayList<>();
+
+        if (serviceList.isEmpty()) {
+            throw new RecordNotFoundException("No services found");
+        }
 
         for(nl.novi.serviceconnect.models.Service service : serviceList) {
             serviceOutputDtos.add(Mapper.fromServiceToDto(service));
         }
+
         return serviceOutputDtos;
     }
 
     @Override
-    public ServiceOutputDto GetServiceById(Long id) {
+    public ServiceOutputDto getServiceById(Long id) {
+        Optional<nl.novi.serviceconnect.models.Service> serviceOptional = repository.findById(id);
 
-        Optional<nl.novi.serviceconnect.models.Service> service = repo.findById(id);
+        nl.novi.serviceconnect.models.Service service = serviceOptional.orElseThrow(() ->
+                new RecordNotFoundException("No service found with id: " + id));
 
-        if(service.isPresent()){
-            return Mapper.fromServiceToDto(service.get());
-        }
-        else {
-            throw new RecordNotFoundException("No service founded");
-        }
+        return Mapper.fromServiceToDto(service);
     }
 
     @Override
-    public ServiceOutputDto UpdateService(Long id, ServiceInputDto serviceInputDto) {
-        Optional<nl.novi.serviceconnect.models.Service> optionalService = repo.findById(id);
+    public ServiceOutputDto updateService(Long id, ServiceInputDto serviceInputDto) {
+        nl.novi.serviceconnect.models.Service existingService = repository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Service with id: " + id + " not found"));
+
+        updateServiceFields(existingService, serviceInputDto);
+
+        repository.save(existingService);
+
+        return Mapper.fromServiceToDto(existingService);
+    }
+
+    private void updateServiceFields(nl.novi.serviceconnect.models.Service service, ServiceInputDto serviceInputDto) {
+        // Only update fields that are not null or empty in the input DTO
+        if (isNotNullOrEmpty(serviceInputDto.getName())) {
+            service.setName(serviceInputDto.getName());
+        }
+        if (isNotNullOrEmpty(serviceInputDto.getDescription())) {
+            service.setDescription(serviceInputDto.getDescription());
+        }
+        if (isNotNullOrEmpty(String.valueOf(serviceInputDto.getState()))) {
+            service.setState(serviceInputDto.getState());
+        }
+        // Check for null explicitly for Double and non-zero for price
+        if (serviceInputDto.getPrice() != null && serviceInputDto.getPrice() != 0.0) {
+            service.setPrice(serviceInputDto.getPrice());
+        }
+    }
+
+    private boolean isNotNullOrEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+    @Override
+    public void deleteService(Long id) {
+        Optional<nl.novi.serviceconnect.models.Service> optionalService = repository.findById(id);
 
         if (optionalService.isPresent()) {
-            nl.novi.serviceconnect.models.Service existingService = optionalService.get();
-            existingService.setName(serviceInputDto.name);
-            existingService.setPrice(serviceInputDto.price);
-            existingService.setDescription(serviceInputDto.description);
-            existingService.setState(serviceInputDto.state);
-
-            repo.save(existingService);
-
-            return Mapper.fromServiceToDto(existingService);
+            repository.deleteById(id);
         } else {
-            throw new RecordNotFoundException("Service with id: " + id + " not found");
+            throw new RecordNotFoundException("Service with id " + id + " not found");
         }
     }
 }

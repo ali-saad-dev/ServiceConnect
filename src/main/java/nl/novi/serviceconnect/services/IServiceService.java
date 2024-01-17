@@ -6,11 +6,13 @@ import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import java.util.List;
 
 public interface IServiceService {
-    ServiceInputDto CreateService(ServiceInputDto serviceInputDto);
-    List<ServiceOutputDto> GetAllService();
+    ServiceInputDto createService(ServiceInputDto serviceInputDto);
+    List<ServiceOutputDto> getAllService();
 
-    ServiceOutputDto GetServiceById(Long id);
+    ServiceOutputDto getServiceById(Long id);
 
-    ServiceOutputDto UpdateService(Long id, ServiceInputDto serviceInputDto);
+    ServiceOutputDto updateService(Long id, ServiceInputDto serviceInputDto);
+
+    void deleteService(Long id);
 }
 

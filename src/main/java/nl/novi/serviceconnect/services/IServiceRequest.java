@@ -1,0 +1,19 @@
+package nl.novi.serviceconnect.services;
+
+import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
+import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
+
+import java.util.List;
+
+public interface IServiceRequest {
+
+    ServiceRequestInputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto);
+
+    List<ServiceRequestOutputDto> getAllServiceRequests();
+
+    ServiceRequestOutputDto getServiceRequestById(Long id);
+
+    ServiceRequestOutputDto updateServiceRequest(Long id, ServiceRequestInputDto serviceRequestInputDto);
+
+    void deleteServiceRequest(Long id);
+}
