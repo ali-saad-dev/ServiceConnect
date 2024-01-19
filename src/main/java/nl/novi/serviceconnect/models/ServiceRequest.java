@@ -2,8 +2,6 @@ package nl.novi.serviceconnect.models;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name="serviceRequest")
 public class ServiceRequest {
@@ -16,6 +14,9 @@ public class ServiceRequest {
     @ManyToOne
     @JoinColumn(name="service_id")
     private Service service;
+
+    @OneToOne(mappedBy = "serviceRequest")
+    private Transaction transaction;
 
     public Long getId() { return id; }
 
@@ -30,4 +31,12 @@ public class ServiceRequest {
     public Service getService() { return service; }
 
     public void setService(Service service) { this.service = service; }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
+    }
 }

@@ -3,6 +3,8 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.ServiceInputDto;
 import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.helpper.Helpers;
+import nl.novi.serviceconnect.helpper.StringHelpers;
 import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.helpper.Mapper;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,11 @@ public class ServiceService implements IServiceService {
         this.repository = repo;
     }
 
+
     @Override
-    public ServiceInputDto createService(ServiceInputDto serviceInputDto) {
-        repository.save(Mapper.fromDtoToService(serviceInputDto));
-        return serviceInputDto;
+    public ServiceOutputDto createService(ServiceInputDto serviceInputDto) {
+        nl.novi.serviceconnect.models.Service service =   repository.save(Mapper.fromDtoToService(serviceInputDto));
+        return Mapper.fromServiceToDto(service);
     }
 
     @Override
@@ -43,45 +46,33 @@ public class ServiceService implements IServiceService {
 
     @Override
     public ServiceOutputDto getServiceById(Long id) {
-        Optional<nl.novi.serviceconnect.models.Service> serviceOptional = repository.findById(id);
+        Optional<nl.novi.serviceconnect.models.Service> service = repository.findById(id);
 
-        nl.novi.serviceconnect.models.Service service = serviceOptional.orElseThrow(() ->
+        nl.novi.serviceconnect.models.Service result = service.orElseThrow(() ->
                 new RecordNotFoundException("No service found with id: " + id));
 
-        return Mapper.fromServiceToDto(service);
+        return Mapper.fromServiceToDto(result);
     }
 
     @Override
     public ServiceOutputDto updateService(Long id, ServiceInputDto serviceInputDto) {
         nl.novi.serviceconnect.models.Service existingService = repository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Service with id: " + id + " not found"));
+       nl.novi.serviceconnect.models.Service result =  updateServiceFields(existingService, serviceInputDto);
+        repository.save(result);
 
-        updateServiceFields(existingService, serviceInputDto);
-
-        repository.save(existingService);
-
-        return Mapper.fromServiceToDto(existingService);
+        return Mapper.fromServiceToDto(result);
     }
 
-    private void updateServiceFields(nl.novi.serviceconnect.models.Service service, ServiceInputDto serviceInputDto) {
-        // Only update fields that are not null or empty in the input DTO
-        if (isNotNullOrEmpty(serviceInputDto.getName())) {
-            service.setName(serviceInputDto.getName());
-        }
-        if (isNotNullOrEmpty(serviceInputDto.getDescription())) {
-            service.setDescription(serviceInputDto.getDescription());
-        }
-        if (isNotNullOrEmpty(String.valueOf(serviceInputDto.getState()))) {
-            service.setState(serviceInputDto.getState());
-        }
-        // Check for null explicitly for Double and non-zero for price
-        if (serviceInputDto.getPrice() != null && serviceInputDto.getPrice() != 0.0) {
-            service.setPrice(serviceInputDto.getPrice());
-        }
-    }
+    private nl.novi.serviceconnect.models.Service updateServiceFields(nl.novi.serviceconnect.models.Service service, ServiceInputDto serviceInputDto) {
 
-    private boolean isNotNullOrEmpty(String value) {
-        return value != null && !value.trim().isEmpty();
+        return new nl.novi.serviceconnect.models.Service(
+                service.getId(),
+                StringHelpers.isNotNullOrEmpty(serviceInputDto.getName()) ? serviceInputDto.getName() : service.getName(),
+                StringHelpers.isNotNullOrEmpty(serviceInputDto.getDescription()) ? serviceInputDto.getDescription() : service.getDescription(),
+                (serviceInputDto.getPrice() != null && serviceInputDto.getPrice() != 0.0) ? serviceInputDto.getPrice() : service.getPrice(),
+                StringHelpers.isNotNullOrEmpty(String.valueOf(serviceInputDto.getState())) ? serviceInputDto.getState() : service.getState()
+        );
     }
     @Override
     public void deleteService(Long id) {

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IServiceRequest {
 
-    ServiceRequestInputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto);
+    ServiceRequestOutputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto);
 
     List<ServiceRequestOutputDto> getAllServiceRequests();
 

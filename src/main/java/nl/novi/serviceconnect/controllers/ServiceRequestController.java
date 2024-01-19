@@ -1,11 +1,10 @@
 package nl.novi.serviceconnect.controllers;
 
 import jakarta.validation.Valid;
-import nl.novi.serviceconnect.dtos.ServiceInputDto;
-import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
 import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.services.IServiceRequest;
 import nl.novi.serviceconnect.services.ServiceRequestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,12 +15,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+import static nl.novi.serviceconnect.helpper.StringHelpers.getObjectResponseEntity;
+
+
 @RestController
 @RequestMapping("/servicesRequest")
 public class ServiceRequestController {
-    private final ServiceRequestService service;
+    private final IServiceRequest service;
 
-    public ServiceRequestController(ServiceRequestService service) {
+    public ServiceRequestController(IServiceRequest service) {
         this.service = service;
     }
 
@@ -29,24 +31,17 @@ public class ServiceRequestController {
     public ResponseEntity<Object> createServiceRequest(@Valid @RequestBody ServiceRequestInputDto inputDto, BindingResult br) {
 
         if (br.hasFieldErrors()) {
-            StringBuilder sb = new StringBuilder();
-            for (FieldError fe : br.getFieldErrors()) {
-                sb.append(fe.getField());
-                sb.append(" : ");
-                sb.append(fe.getDefaultMessage());
-                sb.append("\n");
-            }
-            return ResponseEntity.badRequest().body(sb.toString());
+            return getObjectResponseEntity(br);
         }
         else {
-            ServiceRequestInputDto ServiceRequestInputDto = service.createServiceRequest(inputDto);
+            ServiceRequestOutputDto serviceRequest = service.createServiceRequest(inputDto);
 
             URI uri = URI.create(
                     ServletUriComponentsBuilder
                             .fromCurrentRequest()
-                            .path("/" + ServiceRequestInputDto.id).toUriString());
+                            .path("/" + serviceRequest.id).toUriString());
 
-            return ResponseEntity.created(uri).body(ServiceRequestInputDto);
+            return ResponseEntity.created(uri).body(serviceRequest);
         }
     }
 

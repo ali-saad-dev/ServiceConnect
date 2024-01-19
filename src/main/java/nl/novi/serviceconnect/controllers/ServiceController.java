@@ -4,46 +4,39 @@ import jakarta.validation.Valid;
 import nl.novi.serviceconnect.dtos.ServiceInputDto;
 import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
-import nl.novi.serviceconnect.services.ServiceService;
+import nl.novi.serviceconnect.services.IServiceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 
+import static nl.novi.serviceconnect.helpper.StringHelpers.getObjectResponseEntity;
+
 @RestController
 @RequestMapping("/services")
 public class ServiceController {
-    private final ServiceService service;
-    public ServiceController(ServiceService service) {
+    private final IServiceService service;
+    public ServiceController(IServiceService service) {
         this.service = service;
     }
-
     @PostMapping
     public ResponseEntity<Object> createService(@Valid @RequestBody ServiceInputDto serviceInputDto, BindingResult br) {
 
         if (br.hasFieldErrors()) {
-            StringBuilder sb = new StringBuilder();
-            for (FieldError fe : br.getFieldErrors()) {
-                sb.append(fe.getField());
-                sb.append(" : ");
-                sb.append(fe.getDefaultMessage());
-                sb.append("\n");
-            }
-            return ResponseEntity.badRequest().body(sb.toString());
+            return getObjectResponseEntity(br);
         }
         else {
-            ServiceInputDto ServiceInputDto = service.createService(serviceInputDto);
+            ServiceOutputDto outputDto = service.createService(serviceInputDto);
 
             URI uri = URI.create(
                     ServletUriComponentsBuilder
                             .fromCurrentRequest()
-                            .path("/" + ServiceInputDto.id).toUriString());
+                            .path("/" + outputDto.id).toUriString());
 
-            return ResponseEntity.created(uri).body(ServiceInputDto);
+            return ResponseEntity.created(uri).body(outputDto);
         }
     }
 

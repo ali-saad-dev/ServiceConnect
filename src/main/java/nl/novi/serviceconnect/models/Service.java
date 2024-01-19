@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+
 @Entity
 @Table(name="services")
 public class Service {
@@ -14,13 +15,20 @@ public class Service {
     private String name;
     private String description;
     @Column(name="price", length = 128)
-    private Double price;
+    private double price;
     @Enumerated(EnumType.STRING)
     private ServiceState state;
 
     @OneToMany(mappedBy = "service")
     private List<ServiceRequest> serviceRequests;
-
+    public Service() {}
+    public Service(Long id, String name, String description, double price, ServiceState state) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.state = state;
+    }
     public Long getId() { return id; }
 
     public String getName() {
