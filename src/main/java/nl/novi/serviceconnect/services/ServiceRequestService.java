@@ -1,31 +1,47 @@
 package nl.novi.serviceconnect.services;
 
-import nl.novi.serviceconnect.dtos.ServiceInputDto;
-import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
 import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.helpper.InvoiceGenerator;
 import nl.novi.serviceconnect.helpper.Mapper;
 import nl.novi.serviceconnect.models.ServiceRequest;
+import nl.novi.serviceconnect.models.Transaction;
+import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.repository.ServiceRequestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ServiceRequestService implements IServiceRequest{
     private final ServiceRequestRepository repository;
+    private final ServiceRepository serviceRepository;
 
-    public ServiceRequestService(ServiceRequestRepository repository) {
+    public ServiceRequestService(ServiceRequestRepository repository, ServiceRepository serviceRepository) {
         this.repository = repository;
+        this.serviceRepository = serviceRepository;
     }
 
     @Override
-    public ServiceRequestInputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto) {
-        repository.save(Mapper.fromDtoToServiceRequest(serviceRequestInputDto));
-        return serviceRequestInputDto;
+    public ServiceRequestOutputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto) {
+        ServiceRequest serviceRequestResult =  repository.save(Mapper.fromDtoToServiceRequest(serviceRequestInputDto));
+
+        nl.novi.serviceconnect.models.Service request = serviceRepository.findById(serviceRequestInputDto.getService().getId())
+                .orElseThrow(() -> new RecordNotFoundException("Service not found with id: " + serviceRequestInputDto.getService().getId()));
+        serviceRequestResult.setService(request);
+
+        Transaction transaction = new Transaction();
+        transaction.setTransactionDate(new Date());
+        transaction.setPayed(false);
+        transaction.setInvoice(InvoiceGenerator.generateInvoice(serviceRequestResult));
+
+        serviceRequestResult.setTransaction(transaction);
+
+        return Mapper.fromServiceRequestToDto(serviceRequestResult);
     }
 
     @Override

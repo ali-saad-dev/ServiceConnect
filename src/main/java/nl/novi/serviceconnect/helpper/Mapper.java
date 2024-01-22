@@ -1,11 +1,9 @@
 package nl.novi.serviceconnect.helpper;
 
-import nl.novi.serviceconnect.dtos.ServiceInputDto;
-import nl.novi.serviceconnect.dtos.ServiceOutputDto;
-import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
-import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
+import nl.novi.serviceconnect.dtos.*;
 import nl.novi.serviceconnect.models.Service;
 import nl.novi.serviceconnect.models.ServiceRequest;
+import nl.novi.serviceconnect.models.Transaction;
 
 public class Mapper {
     public static ServiceOutputDto fromServiceToDto(Service service){
@@ -20,10 +18,10 @@ public class Mapper {
 
     public static Service fromDtoToService(ServiceInputDto dto){
         Service service = new Service();
-        service.setName(dto.name);
-        service.setDescription(dto.description);
-        service.setPrice(dto.price);
-        service.setState(dto.state);
+        service.setName(dto.getName());
+        service.setDescription(dto.getDescription());
+        service.setPrice(dto.getPrice());
+        service.setState(dto.getState());
         return  service;
     }
 
@@ -32,13 +30,33 @@ public class Mapper {
         dto.id = serviceRequest.getId();
         dto.message = serviceRequest.getMessage();
         dto.state = serviceRequest.getState();
+        dto.service = serviceRequest.getService();
         return dto;
     }
 
     public static ServiceRequest fromDtoToServiceRequest(ServiceRequestInputDto inputDto){
         ServiceRequest serviceRequest = new ServiceRequest();
-        serviceRequest.setMessage(inputDto.message);
-        serviceRequest.setState(inputDto.state);
+        serviceRequest.setMessage(inputDto.getMessage());
+        serviceRequest.setState(inputDto.getState());
+        serviceRequest.setService(inputDto.getService());
         return  serviceRequest;
+    }
+
+    public static TransactionOutputDto fromTransactionToDto(Transaction transaction){
+        TransactionOutputDto dto = new TransactionOutputDto();
+        dto.id = transaction.getId();
+        dto.transactionDate = transaction.getTransactionDate();
+        dto.isPayed = transaction.getPayed();
+        dto.invoice = transaction.getInvoice();
+        dto.serviceRequestId = transaction.getServiceRequest() != null ? transaction.getServiceRequest().getId() : null;
+        return dto;
+    }
+
+    public static Transaction fromDtoToTransaction(TransactionInputDto dto){
+        Transaction transaction = new Transaction();
+        transaction.setTransactionDate(dto.getTransactionDate());
+        transaction.setPayed(dto.getPayed());
+        transaction.setInvoice(dto.getInvoice());
+        return  transaction;
     }
 }
