@@ -48,6 +48,7 @@ public class Mapper {
         dto.transactionDate = transaction.getTransactionDate();
         dto.isPayed = transaction.getPayed();
         dto.invoice = transaction.getInvoice();
+        dto.serviceRequestId = transaction.getServiceRequest() != null ? transaction.getServiceRequest().getId() : null;
         return dto;
     }
 
@@ -55,6 +56,7 @@ public class Mapper {
         Transaction transaction = new Transaction();
         transaction.setTransactionDate(dto.getTransactionDate());
         transaction.setPayed(dto.getPayed());
+        transaction.setInvoice(dto.getInvoice());
         return  transaction;
     }
 }
