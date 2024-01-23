@@ -2,8 +2,10 @@ package nl.novi.serviceconnect.services;
 
 import nl.novi.serviceconnect.dtos.TransactionInputDto;
 import nl.novi.serviceconnect.dtos.TransactionOutputDto;
+import nl.novi.serviceconnect.dtos.TransactionUpdateDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.helpper.Helpers;
+import nl.novi.serviceconnect.helpper.InvoiceGenerator;
 import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.models.Transaction;
 import nl.novi.serviceconnect.repository.ServiceRequestRepository;
@@ -28,7 +30,7 @@ public class TransactionService implements ITransactionService {
 
     private String saveFile() {
         try {
-            File targetDirectory = new File("C:\\Java-HBO\\LesOpdrachten\\EindProject\\ServiceConnect\\pdfs");
+            File targetDirectory = new File("invoicesPdf");
 
             if (!targetDirectory.exists()) {
                 targetDirectory.mkdirs();
@@ -51,12 +53,12 @@ public class TransactionService implements ITransactionService {
         Transaction transaction = Mapper.fromDtoToTransaction(transactionInputDto);
 
         String filePath = saveFile();
-        transaction.setInvoice(new File(filePath));
+        transaction.setInvoice(filePath);
 
         ServiceRequest serviceRequest = requestRepository.findById(transactionInputDto.getServiceRequestId())
                 .orElseThrow(() -> new RecordNotFoundException("ServiceRequestId not found with id: " + transactionInputDto.getServiceRequestId()));
         transaction.setServiceRequest(serviceRequest);
-
+        InvoiceGenerator.generateInvoice(serviceRequest);
        transactionRepository.save(transaction);
 
         return Mapper.fromTransactionToDto(transaction);
@@ -88,7 +90,7 @@ public class TransactionService implements ITransactionService {
     }
 
     @Override
-    public TransactionOutputDto updateTransaction(Long id, TransactionInputDto inputDto) {
+    public TransactionOutputDto updateTransaction(Long id, TransactionUpdateDto inputDto) {
         Transaction existingTransaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Transaction with id: " + id + " not found"));
         Transaction result =  updateServiceFields(existingTransaction, inputDto);
@@ -97,12 +99,14 @@ public class TransactionService implements ITransactionService {
         return Mapper.fromTransactionToDto(result);
     }
 
-    private Transaction updateServiceFields(Transaction transaction, TransactionInputDto inputDto) {
+    private Transaction updateServiceFields(Transaction transaction, TransactionUpdateDto inputDto) {
 
         return new Transaction(
                 transaction.getId(),
                 Helpers.isNotNullOrEmptyDate(inputDto.getTransactionDate()) ? inputDto.getTransactionDate() : transaction.getTransactionDate(),
-                inputDto.getPayed()
+                inputDto.getPayed(),
+                transaction.getInvoice(),
+                transaction.getServiceRequest()
         );
     }
     @Override

@@ -3,6 +3,8 @@ package nl.novi.serviceconnect.controllers;
 import jakarta.validation.Valid;
 import nl.novi.serviceconnect.dtos.TransactionInputDto;
 import nl.novi.serviceconnect.dtos.TransactionOutputDto;
+import nl.novi.serviceconnect.dtos.TransactionUpdateDto;
+import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.services.ITransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -38,31 +40,31 @@ public class TransactionController {
         return ResponseEntity.ok(TransactionService.getAllTransaction());
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<TransactionOutputDto> getServiceById(@PathVariable Long id) {
-//        TransactionOutputDto transactionId = TransactionService.getTransactionById(id);
-//        return ResponseEntity.ok(transactionId);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<ServiceOutputDto> updateService(@PathVariable Long id, @RequestBody ServiceInputDto serviceInputDto) {
-//        try {
-//            ServiceOutputDto updatedService = service.updateService(id, serviceInputDto);
-//            return ResponseEntity.ok(updatedService);
-//        } catch (RecordNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<ServiceInputDto> deleteService(@PathVariable Long id) {
-//        try {
-//            service.deleteService(id);
-//            return ResponseEntity.ok().build();
-//        } catch (RecordNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<TransactionOutputDto> getTransactionId(@PathVariable Long id) {
+        TransactionOutputDto transactionId = TransactionService.getTransactionById(id);
+        return ResponseEntity.ok(transactionId);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionOutputDto> updateTransaction(@PathVariable Long id, @RequestBody TransactionUpdateDto inputDto) {
+        try {
+            TransactionOutputDto updatedTransaction = TransactionService.updateTransaction(id, inputDto);
+            return ResponseEntity.ok(updatedTransaction);
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TransactionInputDto> deleteTransaction(@PathVariable Long id) {
+        try {
+            TransactionService.deleteTransaction(id);
+            return ResponseEntity.ok().build();
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }
 
