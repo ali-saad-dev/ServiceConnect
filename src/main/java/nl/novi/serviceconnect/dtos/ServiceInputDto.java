@@ -1,5 +1,6 @@
 package nl.novi.serviceconnect.dtos;
 
+import nl.novi.serviceconnect.models.ServiceCategory;
 import nl.novi.serviceconnect.models.ServiceState;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -10,17 +11,14 @@ public class ServiceInputDto {
     @NotBlank(message = "Name is mandatory")
     @Size(min=3, max=128)
     private String name;
-
     @NotBlank(message = "description is mandatory")
     @Size(min=3, max=128)
     private String description;
     @Positive
     private double price;
     private ServiceState state;
-
-    public Long getId() {
-        return id;
-    }
+    private ServiceCategory serviceCategory;
+    public Long getId() { return id; }
     public String getName() {
         return name;
     }
@@ -36,4 +34,6 @@ public class ServiceInputDto {
     public ServiceState getState() {
         return state;
     }
+
+    public ServiceCategory getServiceCategory() { return serviceCategory; }
 }

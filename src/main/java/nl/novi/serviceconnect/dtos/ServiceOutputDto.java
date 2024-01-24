@@ -1,5 +1,6 @@
 package nl.novi.serviceconnect.dtos;
 
+import nl.novi.serviceconnect.models.ServiceCategory;
 import nl.novi.serviceconnect.models.ServiceState;
 
 public class ServiceOutputDto {
@@ -9,4 +10,5 @@ public class ServiceOutputDto {
     public String description;
     public double price;
     public ServiceState state;
+    public ServiceCategory serviceCategory;
 }

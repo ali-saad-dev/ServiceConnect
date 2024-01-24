@@ -3,8 +3,9 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.ServiceInputDto;
 import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
-import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.helpper.StringHelpers;
+import nl.novi.serviceconnect.models.ServiceCategory;
+import nl.novi.serviceconnect.repository.ServiceCategoryRepository;
 import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.helpper.Mapper;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,23 @@ import java.util.Optional;
 @Service
 public class ServiceService implements IServiceService {
     private final ServiceRepository repository;
+    private final ServiceCategoryRepository categoryRepository;
 
-    public ServiceService(ServiceRepository repo) {
+    public ServiceService(ServiceRepository repo, ServiceCategoryRepository categoryRepository) {
         this.repository = repo;
+        this.categoryRepository = categoryRepository;
     }
 
 
     @Override
     public ServiceOutputDto createService(ServiceInputDto serviceInputDto) {
-        nl.novi.serviceconnect.models.Service service =   repository.save(Mapper.fromDtoToService(serviceInputDto));
+        nl.novi.serviceconnect.models.Service service = Mapper.fromDtoToService(serviceInputDto);
+
+       ServiceCategory category = categoryRepository.findById(serviceInputDto.getServiceCategory().getId())
+                .orElseThrow(() -> new RecordNotFoundException("ServiceCategory not found with id: " + serviceInputDto.getServiceCategory().getId()));
+
+        service.setCategory(category);
+        repository.save(service);
         return Mapper.fromServiceToDto(service);
     }
 

@@ -30,9 +30,9 @@ public class ServiceRequestService implements IServiceRequest{
     public ServiceRequestOutputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto) {
         ServiceRequest serviceRequestResult =  repository.save(Mapper.fromDtoToServiceRequest(serviceRequestInputDto));
 
-        nl.novi.serviceconnect.models.Service request = serviceRepository.findById(serviceRequestInputDto.getService().getId())
+        nl.novi.serviceconnect.models.Service service = serviceRepository.findById(serviceRequestInputDto.getService().getId())
                 .orElseThrow(() -> new RecordNotFoundException("Service not found with id: " + serviceRequestInputDto.getService().getId()));
-        serviceRequestResult.setService(request);
+        serviceRequestResult.setService(service);
 
         Transaction transaction = new Transaction();
         transaction.setTransactionDate(new Date());
@@ -81,7 +81,7 @@ public class ServiceRequestService implements IServiceRequest{
     }
 
     private void updateServiceFields(ServiceRequest serviceRequest, ServiceRequestInputDto inputDto) {
-        // Only update fields that are not null or empty in the input DTO
+
         if (Helpers.isNotNullOrEmpty(inputDto.getMessage())) {
             serviceRequest.setMessage(inputDto.getMessage());
         }
