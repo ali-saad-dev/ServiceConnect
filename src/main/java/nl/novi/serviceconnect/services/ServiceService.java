@@ -87,10 +87,10 @@ public class ServiceService implements IServiceService {
     public void deleteService(Long id) {
         Optional<nl.novi.serviceconnect.models.Service> optionalService = repository.findById(id);
 
-        if (optionalService.isPresent()) {
-            repository.deleteById(id);
-        } else {
+        if (optionalService.isEmpty()) {
             throw new RecordNotFoundException("Service with id " + id + " not found");
+        } else {
+            repository.deleteById(id);
         }
     }
 }

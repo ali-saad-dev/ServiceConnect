@@ -112,11 +112,10 @@ public class TransactionService implements ITransactionService {
     @Override
     public void deleteTransaction(Long id) {
         Optional<Transaction> transaction = transactionRepository.findById(id);
-
-        if (transaction.isPresent()) {
-            transactionRepository.deleteById(id);
-        } else {
+        if (transaction.isEmpty()) {
             throw new RecordNotFoundException("Transaction with id " + id + " not found");
+        } else {
+            transactionRepository.deleteById(id);
         }
     }
 }

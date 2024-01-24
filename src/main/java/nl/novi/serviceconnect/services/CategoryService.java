@@ -75,10 +75,10 @@ public class CategoryService implements IServiceCategory {
     public void deleteCategory(Long id) {
         Optional<ServiceCategory> optionalServiceCategory = categoryRepository.findById(id);
 
-        if (optionalServiceCategory.isPresent()) {
-            categoryRepository.deleteById(id);
-        } else {
+        if (optionalServiceCategory.isEmpty()) {
             throw new RecordNotFoundException("Service with id " + id + " not found");
+        } else {
+            categoryRepository.deleteById(id);
         }
     }
 }

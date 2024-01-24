@@ -93,10 +93,10 @@ public class ServiceRequestService implements IServiceRequest{
     public void deleteServiceRequest(Long id) {
         Optional<ServiceRequest> optionalServiceRequest = repository.findById(id);
 
-        if (optionalServiceRequest.isPresent()) {
-            repository.deleteById(id);
-        } else {
+        if (optionalServiceRequest.isEmpty()) {
             throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
+        } else {
+            repository.deleteById(id);
         }
     }
 }
