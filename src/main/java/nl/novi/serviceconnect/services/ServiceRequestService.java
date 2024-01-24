@@ -3,8 +3,8 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
 import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
-import nl.novi.serviceconnect.helpper.InvoiceGenerator;
 import nl.novi.serviceconnect.helpper.Mapper;
+import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.models.Transaction;
 import nl.novi.serviceconnect.repository.ServiceRepository;
@@ -37,7 +37,6 @@ public class ServiceRequestService implements IServiceRequest{
         Transaction transaction = new Transaction();
         transaction.setTransactionDate(new Date());
         transaction.setPayed(false);
-        transaction.setInvoice(InvoiceGenerator.generateInvoice(serviceRequestResult));
 
         serviceRequestResult.setTransaction(transaction);
 
@@ -83,18 +82,13 @@ public class ServiceRequestService implements IServiceRequest{
 
     private void updateServiceFields(ServiceRequest serviceRequest, ServiceRequestInputDto inputDto) {
         // Only update fields that are not null or empty in the input DTO
-        if (isNotNullOrEmpty(inputDto.getMessage())) {
+        if (Helpers.isNotNullOrEmpty(inputDto.getMessage())) {
             serviceRequest.setMessage(inputDto.getMessage());
         }
-        if (isNotNullOrEmpty(String.valueOf(inputDto.getState()))) {
+        if (Helpers.isNotNullOrEmpty(String.valueOf(inputDto.getState()))) {
             serviceRequest.setState(inputDto.getState());
         }
     }
-
-    private boolean isNotNullOrEmpty(String value) {
-        return value != null && !value.trim().isEmpty();
-    }
-
     @Override
     public void deleteServiceRequest(Long id) {
         Optional<ServiceRequest> optionalServiceRequest = repository.findById(id);

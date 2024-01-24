@@ -1,6 +1,5 @@
 package nl.novi.serviceconnect.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.io.File;
@@ -15,15 +14,17 @@ public class Transaction {
     private Long id;
     private Date transactionDate;
     private boolean isPayed;
-    private File invoice;
+    private String invoice;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "serviceRequest_id", referencedColumnName = "id")
     private ServiceRequest serviceRequest;
     public Transaction() {}
-    public Transaction(Long id, Date transactionDate, boolean isPayed) {
+    public Transaction(Long id, Date transactionDate, boolean isPayed, String invoice, ServiceRequest serviceRequest) {
         this.id = id;
         this.transactionDate = transactionDate;
         this.isPayed = isPayed;
+        this.invoice = invoice;
+        this.serviceRequest = serviceRequest;
     }
     public Long getId() {
         return id;
@@ -44,11 +45,11 @@ public class Transaction {
         this.isPayed = isPayed;
     }
 
-    public File getInvoice() {
+    public String getInvoice() {
         return invoice;
     }
 
-    public void setInvoice(File invoice) {
+    public void setInvoice(String invoice) {
         this.invoice = invoice;
     }
 

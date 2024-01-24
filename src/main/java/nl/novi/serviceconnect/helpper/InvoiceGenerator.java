@@ -11,17 +11,27 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class InvoiceGenerator {
-    public static File generateInvoice(ServiceRequest serviceRequest) {
+    public static String  generateInvoice(ServiceRequest serviceRequest) {
         try {
+            // Define the directory where you want to store the PDF invoices
+            String directoryPath = "invoicesPdf";  // Change this to your desired directory path
+
+            // Create the directory if it doesn't exist
+            Path directory = Paths.get(directoryPath);
+            if (!directory.toFile().exists()) {
+                directory.toFile().mkdirs();
+            }
+
             // Generate a unique file name for each invoice
             String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
 
-            // Create a temporary file for the PDF invoice
-            File invoiceFile = new File(fileName);
+            // Create the complete file path for the PDF invoice
+            String filePath = Paths.get(directoryPath, fileName).toString();
 
             // Create a new PDF document
             PDDocument document = new PDDocument();
@@ -31,11 +41,11 @@ public class InvoiceGenerator {
             // Generate the content of the invoice
             generateInvoiceContent(document, serviceRequest);
 
-            // Save the PDF document to the temporary file
-            document.save(invoiceFile);
+            // Save the PDF document to the specified file path
+            document.save(filePath);
             document.close();
 
-            return invoiceFile;
+            return filePath;
         } catch (IOException e) {
             // Handle the exception (e.g., log or throw a custom exception)
             e.printStackTrace();
