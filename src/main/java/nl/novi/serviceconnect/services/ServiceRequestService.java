@@ -11,10 +11,7 @@ import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.repository.ServiceRequestRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ServiceRequestService implements IServiceRequest{
@@ -51,6 +48,8 @@ public class ServiceRequestService implements IServiceRequest{
         if (serviceRequestList.isEmpty()) {
             throw new RecordNotFoundException("No ServiceRequests found");
         }
+
+        serviceRequestList.sort(Comparator.comparing(ServiceRequest::getId));
 
         for(ServiceRequest serviceRequest : serviceRequestList) {
             requestOutputDtos.add(Mapper.fromServiceRequestToDto(serviceRequest));
@@ -93,10 +92,8 @@ public class ServiceRequestService implements IServiceRequest{
     public void deleteServiceRequest(Long id) {
         Optional<ServiceRequest> optionalServiceRequest = repository.findById(id);
 
-        if (optionalServiceRequest.isEmpty()) {
-            throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
-        } else {
-            repository.deleteById(id);
-        }
+        if (optionalServiceRequest.isEmpty()) throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
+
+        repository.deleteById(id);
     }
 }

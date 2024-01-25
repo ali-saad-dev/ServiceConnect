@@ -34,7 +34,7 @@ public class Mapper {
         ServiceRequestOutputDto dto = new ServiceRequestOutputDto();
         dto.id = serviceRequest.getId();
         dto.message = serviceRequest.getMessage();
-        dto.state = serviceRequest.getState();
+        dto.requestState = serviceRequest.getState();
         dto.service = serviceRequest.getService();
         return dto;
     }

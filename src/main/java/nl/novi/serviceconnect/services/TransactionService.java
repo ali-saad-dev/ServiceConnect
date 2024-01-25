@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import nl.novi.serviceconnect.helpper.Mapper;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TransactionService implements ITransactionService {
@@ -72,6 +70,8 @@ public class TransactionService implements ITransactionService {
         if (transactionList.isEmpty()) {
             throw new RecordNotFoundException("No Transaction found");
         }
+
+        transactionList.sort(Comparator.comparing(Transaction::getId));
 
         for(Transaction transaction : transactionList) {
             transactionDtoList.add(Mapper.fromTransactionToDto(transaction));

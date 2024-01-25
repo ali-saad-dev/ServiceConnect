@@ -1,6 +1,9 @@
 package nl.novi.serviceconnect.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name="service_category")
@@ -15,8 +18,9 @@ public class ServiceCategory {
     @Column(name = "description", length = 512)
     private String description;
 
-//    @OneToMany(mappedBy = "Service")
-//    private List<Service> services;
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    private List<Service> services;
     public Long getId() {
         return id;
     }
@@ -36,11 +40,11 @@ public class ServiceCategory {
         this.description = description;
     }
 
-//    public List<Service> getServices() {
-//        return services;
-//    }
-//
-//    public void setServices(List<Service> services) {
-//        this.services = services;
-//    }
+    public List<Service> getServices() {
+        return services;
+    }
+
+    public void setServices(List<Service> services) {
+        this.services = services;
+    }
 }

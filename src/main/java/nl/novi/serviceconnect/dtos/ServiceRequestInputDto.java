@@ -2,22 +2,20 @@ package nl.novi.serviceconnect.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import nl.novi.serviceconnect.models.RequestState;
 import nl.novi.serviceconnect.models.Service;
-import nl.novi.serviceconnect.models.ServiceState;
 
 public class ServiceRequestInputDto {
     private Long id;
     @NotBlank(message = "message is mandatory")
     @Size(min=3, max=256)
     private String message;
-    private ServiceState state;
+    private RequestState requestState;
     private Service service;
     public String getMessage() {
         return message;
     }
-    public ServiceState getState() {
-        return state;
-    }
+    public RequestState getState() { return requestState; }
     public Service getService() {
         return service;
     }

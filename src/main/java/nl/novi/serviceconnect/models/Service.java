@@ -1,6 +1,8 @@
 package nl.novi.serviceconnect.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -24,6 +26,7 @@ public class Service {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @OnDelete(action= OnDeleteAction.SET_NULL)
     private ServiceCategory category;
     public Service() {}
     public Service(Long id, String name, String description, double price, ServiceState state) {

@@ -2,7 +2,6 @@ package nl.novi.serviceconnect.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.File;
 import java.util.Date;
 
 public class TransactionInputDto {
