@@ -29,12 +29,13 @@ public class Service {
     @OnDelete(action= OnDeleteAction.SET_NULL)
     private ServiceCategory category;
     public Service() {}
-    public Service(Long id, String name, String description, double price, ServiceState state) {
+    public Service(Long id, String name, String description, double price, ServiceState state, ServiceCategory serviceCategory) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.state = state;
+        this.category = serviceCategory;
     }
     public Long getId() { return id; }
 

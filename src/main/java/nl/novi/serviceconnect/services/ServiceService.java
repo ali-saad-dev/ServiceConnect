@@ -27,8 +27,8 @@ public class ServiceService implements IServiceService {
     public ServiceOutputDto createService(ServiceInputDto serviceInputDto) {
         nl.novi.serviceconnect.models.Service service = Mapper.fromDtoToService(serviceInputDto);
 
-       ServiceCategory category = categoryRepository.findById(serviceInputDto.getServiceCategory().getId())
-                .orElseThrow(() -> new RecordNotFoundException("ServiceCategory not found with id: " + serviceInputDto.getServiceCategory().getId()));
+       ServiceCategory category = categoryRepository.findById(serviceInputDto.getCategory().getId())
+                .orElseThrow(() -> new RecordNotFoundException("ServiceCategory not found with id: " + serviceInputDto.getCategory().getId()));
 
         service.setCategory(category);
         serviceRepository.save(service);
@@ -80,7 +80,8 @@ public class ServiceService implements IServiceService {
                 StringHelpers.isNotNullOrEmpty(serviceInputDto.getName()) ? serviceInputDto.getName() : service.getName(),
                 StringHelpers.isNotNullOrEmpty(serviceInputDto.getDescription()) ? serviceInputDto.getDescription() : service.getDescription(),
                 (serviceInputDto.getPrice() != null && serviceInputDto.getPrice() != 0.0) ? serviceInputDto.getPrice() : service.getPrice(),
-                StringHelpers.isNotNullOrEmpty(String.valueOf(serviceInputDto.getState())) ? serviceInputDto.getState() : service.getState()
+                StringHelpers.isNotNullOrEmpty(String.valueOf(serviceInputDto.getState())) ? serviceInputDto.getState() : service.getState(),
+                serviceInputDto.getCategory() != null ? serviceInputDto.getCategory() : service.getCategory()
         );
     }
     @Override
