@@ -7,7 +7,6 @@ import nl.novi.serviceconnect.models.RequestState;
 import nl.novi.serviceconnect.models.Service;
 
 public class ServiceRequestInputDto {
-    private Long id;
     @NotBlank(message = "message is mandatory")
     @Size(min=3, max=256)
     private String message;

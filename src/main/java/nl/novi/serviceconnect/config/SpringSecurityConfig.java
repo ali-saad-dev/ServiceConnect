@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +32,7 @@ public class SpringSecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception {
+    public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder) {
         var auth = new DaoAuthenticationProvider();
         auth.setPasswordEncoder(passwordEncoder);
         auth.setUserDetailsService(customUserDetailsService);
@@ -40,49 +41,50 @@ public class SpringSecurityConfig {
     @Bean
     protected SecurityFilterChain filter (HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .httpBasic(basic -> basic.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
                         auth
-                                // .requestMatchers("/**").permitAll()
+                                 //.requestMatchers("/**").permitAll()
 
                                 //serviceCategory
                                 .requestMatchers(HttpMethod.POST,"/serviceCategory").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/serviceCategory").hasRole("USER")
-                                .requestMatchers(HttpMethod.PUT,"/serviceCategory").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,"/serviceCategory").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/serviceCategory/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/serviceCategory/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/serviceCategory/**").hasRole("ADMIN")
 
                                 //service
                                 .requestMatchers(HttpMethod.POST,"/services").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/services").hasRole("USER")
-                                .requestMatchers(HttpMethod.PUT,"/services").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,"/services").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/services/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/services/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/services/**").hasRole("ADMIN")
 
                                 //servicesRequest
-                                .requestMatchers(HttpMethod.POST,"/servicesRequest").hasRole("USER")
-                                .requestMatchers(HttpMethod.GET,"/servicesRequest").hasRole("USER")
-                                .requestMatchers(HttpMethod.PUT,"/servicesRequest").hasRole("USER")
-                                .requestMatchers(HttpMethod.DELETE,"/servicesRequest").hasRole("USER")
+                                .requestMatchers(HttpMethod.POST,"/servicesRequest").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/servicesRequest/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/servicesRequest/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/servicesRequest/**").hasRole("ADMIN")
 
                                 //transaction
-                                .requestMatchers(HttpMethod.POST,"/transaction").hasRole("USER")
-                                .requestMatchers(HttpMethod.GET,"/transaction").hasRole("USER")
-                                .requestMatchers(HttpMethod.PUT,"/transaction").hasRole("USER")
-                                .requestMatchers(HttpMethod.DELETE,"/transaction").hasRole("USER")
+                                .requestMatchers(HttpMethod.POST,"/transaction").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/transaction/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/transaction/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/transaction/**").hasRole("ADMIN")
 
 
-                                //User
-                                .requestMatchers(HttpMethod.GET,"/users").hasAnyRole("USER","ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/users/{username}/authorities").hasRole("ADMIN")
+                                //Users
+                                .requestMatchers(HttpMethod.GET,"/users").hasAnyRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/users/{username}/**").hasAnyRole("USER","ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/users/{username}/authorities/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.PUT, "/users").hasRole("USER")
+                                .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.POST,"/users/register").permitAll()
 
                                 //UserAuthenticateInfo
                                 .requestMatchers("/authenticated").authenticated()
-                                .requestMatchers("/authenticate").permitAll()/*alleen dit punt mag toegankelijk zijn voor niet ingelogde gebruikers*/
-                                .anyRequest().denyAll() /*Deze voeg je altijd als laatste toe, om een default beveiliging te hebben voor eventuele vergeten endpoints of endpoints die je later toevoegd. */
+                                .requestMatchers("/authenticate").permitAll()
+                                .anyRequest().denyAll()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

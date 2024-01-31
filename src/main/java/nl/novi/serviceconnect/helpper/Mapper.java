@@ -12,6 +12,7 @@ public class Mapper {
         dto.price = service.getPrice();
         dto.state = service.getState();
         dto.serviceCategory = service.getCategory();
+        dto.username = service.getUser() != null ? service.getUser().getUsername() : null;
         return dto;
     }
 
@@ -28,9 +29,10 @@ public class Mapper {
     public static ServiceRequestOutputDto fromServiceRequestToDto(ServiceRequest serviceRequest){
         ServiceRequestOutputDto dto = new ServiceRequestOutputDto();
         dto.id = serviceRequest.getId();
+        dto.username = serviceRequest.getUser() != null ? serviceRequest.getUser().getUsername() : null;
         dto.message = serviceRequest.getMessage();
         dto.requestState = serviceRequest.getState();
-        dto.service = serviceRequest.getService();
+        dto.service = fromServiceToDto(serviceRequest.getService());
         return dto;
     }
 
@@ -76,7 +78,8 @@ public class Mapper {
     }
 
     public static UserDto fromUser(User user){
-        var dto = new UserDto();
+        UserDto dto = new UserDto();
+        dto.username = user.getUsername();
         dto.username = user.getUsername();
         dto.password = user.getPassword();
         dto.email = user.getEmail();
@@ -85,7 +88,7 @@ public class Mapper {
     }
 
     public static User toUser(UserDto userDto) {
-        var user = new User();
+        User user = new User();
         user.setUsername(userDto.getUsername());
         user.setPassword(userDto.getPassword());
         user.setEmail(userDto.getEmail());

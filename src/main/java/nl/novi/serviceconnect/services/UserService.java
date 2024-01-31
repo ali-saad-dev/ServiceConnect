@@ -1,5 +1,6 @@
 package nl.novi.serviceconnect.services;
 
+import nl.novi.serviceconnect.dtos.UserUpdateDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.helpper.Mapper;
 import nl.novi.serviceconnect.models.User;
@@ -7,22 +8,16 @@ import org.springframework.stereotype.Service;
 import nl.novi.serviceconnect.repository.UserRepository;
 import nl.novi.serviceconnect.dtos.UserDto;
 import nl.novi.serviceconnect.models.Authority;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 
 @Service
-public class UserService {
-
+public class UserService implements IUserService {
     private final UserRepository repo;
 
+    public UserService(UserRepository repo) { this.repo = repo; }
 
-    public UserService(UserRepository repo) {
-        this.repo = repo;
-    }
-
-
+    @Override
     public List<UserDto> getUsers() {
         List<UserDto> collection = new ArrayList<>();
         List<User> list = repo.findAll();
@@ -32,7 +27,8 @@ public class UserService {
         return collection;
     }
 
-    public UserDto getUser(String username) {
+    @Override
+    public UserDto getUserByUserName(String username) {
         UserDto dto = new UserDto();
         Optional<User> user = repo.findById(username);
         if (user.isPresent()){
@@ -43,26 +39,31 @@ public class UserService {
         return dto;
     }
 
+    @Override
     public boolean userExists(String username) {
         return repo.existsById(username);
     }
 
+    @Override
     public String createUser(UserDto userDto) {
         User newUser = repo.save(Mapper.toUser(userDto));
         return newUser.getUsername();
     }
 
+    @Override
+    public void updateUser(String username, UserUpdateDto newUser) {
+        if (!repo.existsById(username)) throw new RecordNotFoundException("user not found");
+        User user = repo.findById(username).get();
+        user.setEmail(newUser.getEmail());
+        repo.save(user);
+    }
+
+    @Override
     public void deleteUser(String username) {
         repo.deleteById(username);
     }
 
-    public void updateUser(String username, UserDto newUser) {
-        if (!repo.existsById(username)) throw new RecordNotFoundException();
-        User user = repo.findById(username).get();
-        user.setPassword(newUser.getPassword());
-        repo.save(user);
-    }
-
+    @Override
     public Set<Authority> getAuthorities(String username) {
         if (!repo.existsById(username)) throw new RecordNotFoundException(username);
         User user = repo.findById(username).get();
@@ -70,6 +71,7 @@ public class UserService {
         return userDto.getAuthorities();
     }
 
+    @Override
     public void addAuthority(String username, String authority) {
 
         if (!repo.existsById(username)) throw new RecordNotFoundException(username);
@@ -78,6 +80,7 @@ public class UserService {
         repo.save(user);
     }
 
+    @Override
     public void removeAuthority(String username, String authority) {
         if (!repo.existsById(username)) throw new RecordNotFoundException(username);
         User user = repo.findById(username).get();

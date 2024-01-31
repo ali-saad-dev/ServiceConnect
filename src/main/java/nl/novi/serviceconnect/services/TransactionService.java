@@ -56,7 +56,9 @@ public class TransactionService implements ITransactionService {
         ServiceRequest serviceRequest = requestRepository.findById(transactionInputDto.getServiceRequestId())
                 .orElseThrow(() -> new RecordNotFoundException("ServiceRequestId not found with id: " + transactionInputDto.getServiceRequestId()));
         transaction.setServiceRequest(serviceRequest);
+
         InvoiceGenerator.generateInvoice(serviceRequest);
+
        transactionRepository.save(transaction);
 
         return Mapper.fromTransactionToDto(transaction);

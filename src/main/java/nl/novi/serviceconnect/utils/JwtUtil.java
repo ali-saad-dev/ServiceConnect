@@ -23,9 +23,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
+    public String extractUsername(String token) { return extractClaim(token, Claims::getSubject); }
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);

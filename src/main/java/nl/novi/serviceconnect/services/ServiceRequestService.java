@@ -3,46 +3,58 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
 import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.exceptions.UsernameNotFoundException;
 import nl.novi.serviceconnect.helpper.Mapper;
 import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.models.ServiceRequest;
-import nl.novi.serviceconnect.models.Transaction;
+import nl.novi.serviceconnect.models.User;
 import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.repository.ServiceRequestRepository;
+import nl.novi.serviceconnect.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class ServiceRequestService implements IServiceRequest{
-    private final ServiceRequestRepository repository;
+    private final ServiceRequestRepository serviceRequestRepository;
     private final ServiceRepository serviceRepository;
+    private final UserRepository userRepository;
 
-    public ServiceRequestService(ServiceRequestRepository repository, ServiceRepository serviceRepository) {
-        this.repository = repository;
+    public ServiceRequestService(ServiceRequestRepository repository, ServiceRepository serviceRepository, UserRepository userRepository) {
+        this.serviceRequestRepository = repository;
         this.serviceRepository = serviceRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public ServiceRequestOutputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto) {
-        ServiceRequest serviceRequestResult =  repository.save(Mapper.fromDtoToServiceRequest(serviceRequestInputDto));
+    public ServiceRequestOutputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto, String username) {
+        ServiceRequest serviceRequestResult =  Mapper.fromDtoToServiceRequest(serviceRequestInputDto);
 
         nl.novi.serviceconnect.models.Service service = serviceRepository.findById(serviceRequestInputDto.getService().getId())
                 .orElseThrow(() -> new RecordNotFoundException("Service not found with id: " + serviceRequestInputDto.getService().getId()));
         serviceRequestResult.setService(service);
 
-        Transaction transaction = new Transaction();
-        transaction.setTransactionDate(new Date());
-        transaction.setPayed(false);
+        if (username != null && !username.isEmpty()) {
+            User user = userRepository.findById(username).orElseThrow(() -> new RecordNotFoundException("User not found with username: " + username));
+            serviceRequestResult.setUser(user);
+        } else {
+            throw new UsernameNotFoundException("Username is empty or null");
+        }
+        serviceRequestRepository.save(serviceRequestResult);
 
-        serviceRequestResult.setTransaction(transaction);
+//        Transaction transaction = new Transaction();
+//        transaction.setTransactionDate(new Date());
+//        transaction.setPayed(false);
+//        serviceRequestResult.setTransaction(transaction);
+
 
         return Mapper.fromServiceRequestToDto(serviceRequestResult);
     }
 
     @Override
     public List<ServiceRequestOutputDto> getAllServiceRequests() {
-        List<ServiceRequest> serviceRequestList = repository.findAll();
+        List<ServiceRequest> serviceRequestList = serviceRequestRepository.findAll();
         List<ServiceRequestOutputDto> requestOutputDtos = new ArrayList<>();
 
         if (serviceRequestList.isEmpty()) {
@@ -60,7 +72,7 @@ public class ServiceRequestService implements IServiceRequest{
 
     @Override
     public ServiceRequestOutputDto getServiceRequestById(Long id) {
-        Optional<ServiceRequest> serviceRequestOptional = repository.findById(id);
+        Optional<ServiceRequest> serviceRequestOptional = serviceRequestRepository.findById(id);
 
         ServiceRequest serviceRequest = serviceRequestOptional.orElseThrow(() ->
                 new RecordNotFoundException("No ServiceRequest found with id: " + id));
@@ -69,12 +81,12 @@ public class ServiceRequestService implements IServiceRequest{
     }
     @Override
     public ServiceRequestOutputDto updateServiceRequest(Long id, ServiceRequestInputDto inputDto) {
-        ServiceRequest existingService = repository.findById(id)
+        ServiceRequest existingService = serviceRequestRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("ServiceRequest with id: " + id + " not found"));
 
         updateServiceFields(existingService, inputDto);
 
-        repository.save(existingService);
+        serviceRequestRepository.save(existingService);
 
         return Mapper.fromServiceRequestToDto(existingService);
     }
@@ -90,10 +102,10 @@ public class ServiceRequestService implements IServiceRequest{
     }
     @Override
     public void deleteServiceRequest(Long id) {
-        Optional<ServiceRequest> optionalServiceRequest = repository.findById(id);
+        Optional<ServiceRequest> optionalServiceRequest = serviceRequestRepository.findById(id);
 
         if (optionalServiceRequest.isEmpty()) throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
 
-        repository.deleteById(id);
+        serviceRequestRepository.deleteById(id);
     }
 }

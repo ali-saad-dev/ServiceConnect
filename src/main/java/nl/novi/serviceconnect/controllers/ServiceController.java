@@ -1,10 +1,13 @@
 package nl.novi.serviceconnect.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import nl.novi.serviceconnect.dtos.ServiceInputDto;
 import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.helpper.TokenHelper;
 import nl.novi.serviceconnect.services.IServiceService;
+import nl.novi.serviceconnect.utils.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -19,17 +22,21 @@ import static nl.novi.serviceconnect.helpper.StringHelpers.getObjectResponseEnti
 @RequestMapping("/services")
 public class ServiceController {
     private final IServiceService service;
-    public ServiceController(IServiceService service) {
+    private final JwtUtil jwtUtil;
+    public ServiceController(IServiceService service, JwtUtil jwtUtil) {
         this.service = service;
+        this.jwtUtil = jwtUtil;
     }
     @PostMapping
-    public ResponseEntity<Object> createService(@Valid @RequestBody ServiceInputDto serviceInputDto, BindingResult br) {
+    public ResponseEntity<Object> createService(@Valid @RequestBody ServiceInputDto serviceInputDto, HttpServletRequest request, BindingResult br) {
 
         if (br.hasFieldErrors()) {
             return getObjectResponseEntity(br);
         }
         else {
-            ServiceOutputDto outputDto = service.createService(serviceInputDto);
+            String user = TokenHelper.getUserNameFromToken(request , jwtUtil);
+
+            ServiceOutputDto outputDto = service.createService(serviceInputDto, user);
 
             URI uri = URI.create(
                     ServletUriComponentsBuilder

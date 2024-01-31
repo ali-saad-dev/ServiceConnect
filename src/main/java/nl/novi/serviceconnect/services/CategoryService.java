@@ -23,7 +23,8 @@ public class CategoryService implements IServiceCategory {
 
     @Override
     public ServiceCategoryOutputDto createServiceCategory(ServiceCategoryInputDto inputDto) {
-        ServiceCategory serviceCategoryResult =  categoryRepository.save(Mapper.fromDtoToCategory(inputDto));
+        ServiceCategory serviceCategoryResult =  Mapper.fromDtoToCategory(inputDto);
+        categoryRepository.save(serviceCategoryResult);
         return Mapper.fromCategoryToDto(serviceCategoryResult);
     }
 

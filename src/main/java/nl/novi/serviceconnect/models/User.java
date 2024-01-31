@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @Column(nullable = false, unique = true)
     private String username;
@@ -25,7 +25,10 @@ public class User {
     @Email(message = "{Pattern.email}")
     @Size(min=10, max=50)
     private String email;
-
+    @OneToMany(mappedBy = "user")
+    private List<Service> services;
+    @OneToMany(mappedBy = "user")
+    private List<ServiceRequest> serviceRequests;
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     public String getPassword() { return password; }
