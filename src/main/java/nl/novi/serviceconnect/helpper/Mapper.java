@@ -1,12 +1,7 @@
 package nl.novi.serviceconnect.helpper;
 
 import nl.novi.serviceconnect.dtos.*;
-import nl.novi.serviceconnect.models.Service;
-import nl.novi.serviceconnect.models.ServiceCategory;
-import nl.novi.serviceconnect.models.ServiceRequest;
-import nl.novi.serviceconnect.models.Transaction;
-
-import java.util.List;
+import nl.novi.serviceconnect.models.*;
 
 public class Mapper {
     public static ServiceOutputDto fromServiceToDto(Service service){
@@ -26,7 +21,7 @@ public class Mapper {
         service.setDescription(dto.getDescription());
         service.setPrice(dto.getPrice());
         service.setState(dto.getState());
-        service.setCategory(dto.getServiceCategory());
+        service.setCategory(dto.getCategory());
         return  service;
     }
 
@@ -78,5 +73,22 @@ public class Mapper {
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
         return  category;
+    }
+
+    public static UserDto fromUser(User user){
+        var dto = new UserDto();
+        dto.username = user.getUsername();
+        dto.password = user.getPassword();
+        dto.email = user.getEmail();
+        dto.authorities = user.getAuthorities();
+        return dto;
+    }
+
+    public static User toUser(UserDto userDto) {
+        var user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setPassword(userDto.getPassword());
+        user.setEmail(userDto.getEmail());
+        return user;
     }
 }

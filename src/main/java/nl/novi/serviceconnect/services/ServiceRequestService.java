@@ -84,7 +84,7 @@ public class ServiceRequestService implements IServiceRequest{
         if (Helpers.isNotNullOrEmpty(inputDto.getMessage())) {
             serviceRequest.setMessage(inputDto.getMessage());
         }
-        if (Helpers.isNotNullOrEmpty(String.valueOf(inputDto.getState()))) {
+        if ((inputDto.getState()!=null)) {
             serviceRequest.setState(inputDto.getState());
         }
     }

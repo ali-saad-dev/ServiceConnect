@@ -29,3 +29,13 @@ INSERT INTO transaction (service_request_id, transaction_date, is_payed, invoice
  (4, '2024-01-18', false, NULL),
  (5, '2024-01-19', true, 'LesOpdrachten\\EindProject\\ServiceConnect\\invoicesPdf\\invoice_1706085627890.pdf'),
  (6, '2024-01-20', true, 'LesOpdrachten\\EindProject\\ServiceConnect\\invoicesPdf\\invoice_1706085631234.pdf');
+
+--10 unit test voor en 2 service testen, en 2 integration test
+--proberen design pattern te implementeren
+
+
+INSERT INTO users (username, password, email) VALUES ('user', '$2a$12$IzA1Ja1LH4PSMoro9PeITO1etDlknPjSX1nLusgt1vi9c1uaEXdEK','user@test.nl');
+INSERT INTO users (username, password, email) VALUES ('admin', '$2a$12$IzA1Ja1LH4PSMoro9PeITO1etDlknPjSX1nLusgt1vi9c1uaEXdEK', 'admin@test.nl');
+INSERT INTO authorities (username, authority) VALUES ('user', 'ROLE_USER');
+INSERT INTO authorities (username, authority) VALUES ('admin', 'ROLE_USER');
+INSERT INTO authorities (username, authority) VALUES ('admin', 'ROLE_ADMIN');

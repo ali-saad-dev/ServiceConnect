@@ -35,5 +35,5 @@ public class ServiceInputDto {
         return state;
     }
 
-    public ServiceCategory getServiceCategory() { return serviceCategory; }
+    public ServiceCategory getCategory() { return serviceCategory; }
 }
