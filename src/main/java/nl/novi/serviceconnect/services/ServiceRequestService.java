@@ -11,10 +11,7 @@ import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.repository.ServiceRequestRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ServiceRequestService implements IServiceRequest{
@@ -30,9 +27,9 @@ public class ServiceRequestService implements IServiceRequest{
     public ServiceRequestOutputDto createServiceRequest(ServiceRequestInputDto serviceRequestInputDto) {
         ServiceRequest serviceRequestResult =  repository.save(Mapper.fromDtoToServiceRequest(serviceRequestInputDto));
 
-        nl.novi.serviceconnect.models.Service request = serviceRepository.findById(serviceRequestInputDto.getService().getId())
+        nl.novi.serviceconnect.models.Service service = serviceRepository.findById(serviceRequestInputDto.getService().getId())
                 .orElseThrow(() -> new RecordNotFoundException("Service not found with id: " + serviceRequestInputDto.getService().getId()));
-        serviceRequestResult.setService(request);
+        serviceRequestResult.setService(service);
 
         Transaction transaction = new Transaction();
         transaction.setTransactionDate(new Date());
@@ -51,6 +48,8 @@ public class ServiceRequestService implements IServiceRequest{
         if (serviceRequestList.isEmpty()) {
             throw new RecordNotFoundException("No ServiceRequests found");
         }
+
+        serviceRequestList.sort(Comparator.comparing(ServiceRequest::getId));
 
         for(ServiceRequest serviceRequest : serviceRequestList) {
             requestOutputDtos.add(Mapper.fromServiceRequestToDto(serviceRequest));
@@ -81,7 +80,7 @@ public class ServiceRequestService implements IServiceRequest{
     }
 
     private void updateServiceFields(ServiceRequest serviceRequest, ServiceRequestInputDto inputDto) {
-        // Only update fields that are not null or empty in the input DTO
+
         if (Helpers.isNotNullOrEmpty(inputDto.getMessage())) {
             serviceRequest.setMessage(inputDto.getMessage());
         }
@@ -93,10 +92,8 @@ public class ServiceRequestService implements IServiceRequest{
     public void deleteServiceRequest(Long id) {
         Optional<ServiceRequest> optionalServiceRequest = repository.findById(id);
 
-        if (optionalServiceRequest.isPresent()) {
-            repository.deleteById(id);
-        } else {
-            throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
-        }
+        if (optionalServiceRequest.isEmpty()) throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
+
+        repository.deleteById(id);
     }
 }

@@ -1,6 +1,8 @@
 package nl.novi.serviceconnect.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -11,7 +13,7 @@ public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="services-name", length = 128)
+    @Column(name="services_name", length = 128)
     private String name;
     private String description;
     @Column(name="price", length = 128)
@@ -21,6 +23,11 @@ public class Service {
 
     @OneToMany(mappedBy = "service")
     private List<ServiceRequest> serviceRequests;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    @OnDelete(action= OnDeleteAction.SET_NULL)
+    private ServiceCategory category;
     public Service() {}
     public Service(Long id, String name, String description, double price, ServiceState state) {
         this.id = id;
@@ -62,4 +69,8 @@ public class Service {
     public void setState(ServiceState state) {
         this.state = state;
     }
+
+    public ServiceCategory getCategory() { return category; }
+
+    public void setCategory(ServiceCategory category) { this.category = category; }
 }

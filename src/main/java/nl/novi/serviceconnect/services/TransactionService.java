@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import nl.novi.serviceconnect.helpper.Mapper;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TransactionService implements ITransactionService {
@@ -73,6 +71,8 @@ public class TransactionService implements ITransactionService {
             throw new RecordNotFoundException("No Transaction found");
         }
 
+        transactionList.sort(Comparator.comparing(Transaction::getId));
+
         for(Transaction transaction : transactionList) {
             transactionDtoList.add(Mapper.fromTransactionToDto(transaction));
         }
@@ -112,11 +112,10 @@ public class TransactionService implements ITransactionService {
     @Override
     public void deleteTransaction(Long id) {
         Optional<Transaction> transaction = transactionRepository.findById(id);
-
-        if (transaction.isPresent()) {
-            transactionRepository.deleteById(id);
-        } else {
+        if (transaction.isEmpty()) {
             throw new RecordNotFoundException("Transaction with id " + id + " not found");
+        } else {
+            transactionRepository.deleteById(id);
         }
     }
 }

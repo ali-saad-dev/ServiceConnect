@@ -1,6 +1,8 @@
 package nl.novi.serviceconnect.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name="serviceRequest")
@@ -10,9 +12,10 @@ public class ServiceRequest {
     private Long id;
     private String message;
     @Enumerated(EnumType.STRING)
-    private ServiceState state;
+    private RequestState requestState;
     @ManyToOne
     @JoinColumn(name="service_id")
+    @OnDelete(action= OnDeleteAction.SET_NULL)
     private Service service;
 
     @OneToOne(mappedBy = "serviceRequest")
@@ -24,17 +27,13 @@ public class ServiceRequest {
 
     public void setMessage(String message) { this.message = message; }
 
-    public ServiceState getState() { return state; }
+    public RequestState getState() { return requestState; }
 
-    public void setState(ServiceState state) { this.state = state; }
+    public void setState(RequestState state) { this.requestState = state; }
 
     public Service getService() { return service; }
 
     public void setService(Service service) { this.service = service; }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;

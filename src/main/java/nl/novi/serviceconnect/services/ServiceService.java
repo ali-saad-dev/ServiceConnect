@@ -3,39 +3,48 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.ServiceInputDto;
 import nl.novi.serviceconnect.dtos.ServiceOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
-import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.helpper.StringHelpers;
+import nl.novi.serviceconnect.models.ServiceCategory;
+import nl.novi.serviceconnect.repository.ServiceCategoryRepository;
 import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.helpper.Mapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ServiceService implements IServiceService {
-    private final ServiceRepository repository;
+    private final ServiceRepository serviceRepository;
+    private final ServiceCategoryRepository categoryRepository;
 
-    public ServiceService(ServiceRepository repo) {
-        this.repository = repo;
+    public ServiceService(ServiceRepository serviceRepo, ServiceCategoryRepository categoryRepository) {
+        this.serviceRepository = serviceRepo;
+        this.categoryRepository = categoryRepository;
     }
 
 
     @Override
     public ServiceOutputDto createService(ServiceInputDto serviceInputDto) {
-        nl.novi.serviceconnect.models.Service service =   repository.save(Mapper.fromDtoToService(serviceInputDto));
+        nl.novi.serviceconnect.models.Service service = Mapper.fromDtoToService(serviceInputDto);
+
+       ServiceCategory category = categoryRepository.findById(serviceInputDto.getServiceCategory().getId())
+                .orElseThrow(() -> new RecordNotFoundException("ServiceCategory not found with id: " + serviceInputDto.getServiceCategory().getId()));
+
+        service.setCategory(category);
+        serviceRepository.save(service);
         return Mapper.fromServiceToDto(service);
     }
 
     @Override
     public List<ServiceOutputDto> getAllService() {
-        List<nl.novi.serviceconnect.models.Service> serviceList = repository.findAll();
+        List<nl.novi.serviceconnect.models.Service> serviceList = serviceRepository.findAll();
         List<ServiceOutputDto> serviceOutputDtos = new ArrayList<>();
 
         if (serviceList.isEmpty()) {
             throw new RecordNotFoundException("No services found");
         }
+
+        serviceList.sort(Comparator.comparing(nl.novi.serviceconnect.models.Service::getId));
 
         for(nl.novi.serviceconnect.models.Service service : serviceList) {
             serviceOutputDtos.add(Mapper.fromServiceToDto(service));
@@ -46,7 +55,7 @@ public class ServiceService implements IServiceService {
 
     @Override
     public ServiceOutputDto getServiceById(Long id) {
-        Optional<nl.novi.serviceconnect.models.Service> service = repository.findById(id);
+        Optional<nl.novi.serviceconnect.models.Service> service = serviceRepository.findById(id);
 
         nl.novi.serviceconnect.models.Service result = service.orElseThrow(() ->
                 new RecordNotFoundException("No service found with id: " + id));
@@ -56,10 +65,10 @@ public class ServiceService implements IServiceService {
 
     @Override
     public ServiceOutputDto updateService(Long id, ServiceInputDto serviceInputDto) {
-        nl.novi.serviceconnect.models.Service existingService = repository.findById(id)
+        nl.novi.serviceconnect.models.Service existingService = serviceRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Service with id: " + id + " not found"));
        nl.novi.serviceconnect.models.Service result =  updateServiceFields(existingService, serviceInputDto);
-        repository.save(result);
+        serviceRepository.save(result);
 
         return Mapper.fromServiceToDto(result);
     }
@@ -76,12 +85,12 @@ public class ServiceService implements IServiceService {
     }
     @Override
     public void deleteService(Long id) {
-        Optional<nl.novi.serviceconnect.models.Service> optionalService = repository.findById(id);
+        Optional<nl.novi.serviceconnect.models.Service> optionalService = serviceRepository.findById(id);
 
-        if (optionalService.isPresent()) {
-            repository.deleteById(id);
-        } else {
+        if (optionalService.isEmpty()) {
             throw new RecordNotFoundException("Service with id " + id + " not found");
+        } else {
+            serviceRepository.deleteById(id);
         }
     }
 }

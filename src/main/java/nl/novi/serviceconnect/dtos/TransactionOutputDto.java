@@ -1,4 +1,6 @@
 package nl.novi.serviceconnect.dtos;
+
+
 import java.util.Date;
 
 public class TransactionOutputDto {

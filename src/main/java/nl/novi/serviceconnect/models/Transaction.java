@@ -1,8 +1,9 @@
 package nl.novi.serviceconnect.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.File;
 import java.util.Date;
 
 
@@ -15,8 +16,9 @@ public class Transaction {
     private Date transactionDate;
     private boolean isPayed;
     private String invoice;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "serviceRequest_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "serviceRequest_id")
+    @OnDelete(action= OnDeleteAction.SET_NULL)
     private ServiceRequest serviceRequest;
     public Transaction() {}
     public Transaction(Long id, Date transactionDate, boolean isPayed, String invoice, ServiceRequest serviceRequest) {

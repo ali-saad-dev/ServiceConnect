@@ -2,8 +2,11 @@ package nl.novi.serviceconnect.helpper;
 
 import nl.novi.serviceconnect.dtos.*;
 import nl.novi.serviceconnect.models.Service;
+import nl.novi.serviceconnect.models.ServiceCategory;
 import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.models.Transaction;
+
+import java.util.List;
 
 public class Mapper {
     public static ServiceOutputDto fromServiceToDto(Service service){
@@ -13,6 +16,7 @@ public class Mapper {
         dto.description = service.getDescription();
         dto.price = service.getPrice();
         dto.state = service.getState();
+        dto.serviceCategory = service.getCategory();
         return dto;
     }
 
@@ -22,6 +26,7 @@ public class Mapper {
         service.setDescription(dto.getDescription());
         service.setPrice(dto.getPrice());
         service.setState(dto.getState());
+        service.setCategory(dto.getServiceCategory());
         return  service;
     }
 
@@ -29,7 +34,7 @@ public class Mapper {
         ServiceRequestOutputDto dto = new ServiceRequestOutputDto();
         dto.id = serviceRequest.getId();
         dto.message = serviceRequest.getMessage();
-        dto.state = serviceRequest.getState();
+        dto.requestState = serviceRequest.getState();
         dto.service = serviceRequest.getService();
         return dto;
     }
@@ -58,5 +63,20 @@ public class Mapper {
         transaction.setPayed(dto.getPayed());
         transaction.setInvoice(dto.getInvoice());
         return  transaction;
+    }
+
+    public static ServiceCategoryOutputDto fromCategoryToDto(ServiceCategory category){
+        ServiceCategoryOutputDto dto = new ServiceCategoryOutputDto();
+        dto.id = category.getId();
+        dto.name = category.getName();
+        dto.description = category.getDescription();
+        return dto;
+    }
+
+    public static ServiceCategory fromDtoToCategory(ServiceCategoryInputDto dto){
+        ServiceCategory category = new ServiceCategory();
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+        return  category;
     }
 }
