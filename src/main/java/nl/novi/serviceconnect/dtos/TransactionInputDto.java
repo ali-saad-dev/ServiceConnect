@@ -9,7 +9,6 @@ public class TransactionInputDto {
     @JsonProperty("isPayed")
     private boolean isPayed;
     private Long serviceRequestId;
-    public String invoice;
     public Date getTransactionDate() {
         return transactionDate;
     }
@@ -18,8 +17,5 @@ public class TransactionInputDto {
     }
     public Long getServiceRequestId() {
         return serviceRequestId;
-    }
-    public String getInvoice() {
-        return invoice;
     }
 }

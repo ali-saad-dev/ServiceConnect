@@ -58,7 +58,6 @@ public class Mapper {
         Transaction transaction = new Transaction();
         transaction.setTransactionDate(dto.getTransactionDate());
         transaction.setPayed(dto.getPayed());
-        transaction.setInvoice(dto.getInvoice());
         return  transaction;
     }
 
