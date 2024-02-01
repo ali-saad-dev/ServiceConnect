@@ -2,12 +2,16 @@ package nl.novi.serviceconnect.services;
 
 import nl.novi.serviceconnect.dtos.ServiceInputDto;
 import nl.novi.serviceconnect.dtos.ServiceOutputDto;
+import nl.novi.serviceconnect.exceptions.BadRequestException;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.exceptions.UsernameNotFoundException;
 import nl.novi.serviceconnect.helpper.StringHelpers;
 import nl.novi.serviceconnect.models.ServiceCategory;
+import nl.novi.serviceconnect.models.User;
 import nl.novi.serviceconnect.repository.ServiceCategoryRepository;
 import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.helpper.Mapper;
+import nl.novi.serviceconnect.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,23 +20,35 @@ import java.util.*;
 public class ServiceService implements IServiceService {
     private final ServiceRepository serviceRepository;
     private final ServiceCategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    public ServiceService(ServiceRepository serviceRepo, ServiceCategoryRepository categoryRepository) {
+    public ServiceService(ServiceRepository serviceRepo, ServiceCategoryRepository categoryRepository, UserRepository userRepository1) {
         this.serviceRepository = serviceRepo;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository1;
     }
 
-
     @Override
-    public ServiceOutputDto createService(ServiceInputDto serviceInputDto) {
+    public ServiceOutputDto createService(ServiceInputDto serviceInputDto, String username) {
         nl.novi.serviceconnect.models.Service service = Mapper.fromDtoToService(serviceInputDto);
 
-       ServiceCategory category = categoryRepository.findById(serviceInputDto.getCategory().getId())
-                .orElseThrow(() -> new RecordNotFoundException("ServiceCategory not found with id: " + serviceInputDto.getCategory().getId()));
+        if (serviceInputDto.getCategory() != null && serviceInputDto.getCategory().getId() != null) {
+            ServiceCategory category = categoryRepository.findById(serviceInputDto.getCategory().getId())
+                    .orElseThrow(() -> new RecordNotFoundException("ServiceCategory not found with id: " + serviceInputDto.getCategory().getId()));
 
-        service.setCategory(category);
-        serviceRepository.save(service);
-        return Mapper.fromServiceToDto(service);
+            if (username != null && !username.isEmpty()) {
+                User user = userRepository.findById(username).orElseThrow(() -> new RecordNotFoundException("User not found with username: " + username));
+                service.setUser(user);
+            } else {
+                throw new UsernameNotFoundException("Username is empty or null");
+            }
+
+            service.setCategory(category);
+            serviceRepository.save(service);
+            return Mapper.fromServiceToDto(service);
+        } else {
+            throw new BadRequestException("ServiceCategory or category ID is null in the input DTO");
+        }
     }
 
     @Override
@@ -75,7 +91,7 @@ public class ServiceService implements IServiceService {
 
     private nl.novi.serviceconnect.models.Service updateServiceFields(nl.novi.serviceconnect.models.Service service, ServiceInputDto serviceInputDto) {
 
-        return new nl.novi.serviceconnect.models.Service(
+        return new nl.novi.serviceconnect.models.Service (
                 service.getId(),
                 StringHelpers.isNotNullOrEmpty(serviceInputDto.getName()) ? serviceInputDto.getName() : service.getName(),
                 StringHelpers.isNotNullOrEmpty(serviceInputDto.getDescription()) ? serviceInputDto.getDescription() : service.getDescription(),

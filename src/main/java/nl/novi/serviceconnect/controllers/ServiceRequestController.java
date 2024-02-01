@@ -1,14 +1,15 @@
 package nl.novi.serviceconnect.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
 import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.helpper.TokenHelper;
 import nl.novi.serviceconnect.services.IServiceRequest;
-import nl.novi.serviceconnect.services.ServiceRequestService;
+import nl.novi.serviceconnect.utils.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -22,19 +23,23 @@ import static nl.novi.serviceconnect.helpper.StringHelpers.getObjectResponseEnti
 @RequestMapping("/servicesRequest")
 public class ServiceRequestController {
     private final IServiceRequest service;
+    private final JwtUtil jwtUtil;
 
-    public ServiceRequestController(IServiceRequest service) {
+    public ServiceRequestController(IServiceRequest service, JwtUtil jwtUtil) {
         this.service = service;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping
-    public ResponseEntity<Object> createServiceRequest(@Valid @RequestBody ServiceRequestInputDto inputDto, BindingResult br) {
+    public ResponseEntity<Object> createServiceRequest(@Valid @RequestBody ServiceRequestInputDto inputDto, HttpServletRequest request, BindingResult br) {
 
         if (br.hasFieldErrors()) {
             return getObjectResponseEntity(br);
         }
         else {
-            ServiceRequestOutputDto serviceRequest = service.createServiceRequest(inputDto);
+            String user = TokenHelper.getUserNameFromToken(request , jwtUtil);
+
+            ServiceRequestOutputDto serviceRequest = service.createServiceRequest(inputDto, user);
 
             URI uri = URI.create(
                     ServletUriComponentsBuilder

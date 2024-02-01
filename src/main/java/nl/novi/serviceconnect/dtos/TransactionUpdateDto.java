@@ -8,11 +8,7 @@ public class TransactionUpdateDto {
     private Date transactionDate;
     @JsonProperty("isPayed")
     private boolean isPayed;
-
-    public Date getTransactionDate() {
-        return transactionDate;
-    }
-
+    public Date getTransactionDate() { return transactionDate; }
     public boolean getPayed() {
         return isPayed;
     }

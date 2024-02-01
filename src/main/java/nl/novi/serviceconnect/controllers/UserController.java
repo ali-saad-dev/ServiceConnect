@@ -1,8 +1,10 @@
 package nl.novi.serviceconnect.controllers;
 
 import nl.novi.serviceconnect.dtos.UserDto;
+import nl.novi.serviceconnect.dtos.UserUpdateDto;
 import nl.novi.serviceconnect.exceptions.BadRequestException;
-import nl.novi.serviceconnect.services.UserService;
+import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.services.IUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,10 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
-    private final UserService userService;
+    private final IUserService userService;
     private final PasswordEncoder encoder;
 
-    public UserController(UserService userService, PasswordEncoder encoder) {
+    public UserController(IUserService userService, PasswordEncoder encoder) {
         this.userService = userService;
         this.encoder = encoder;
     }
@@ -33,9 +35,9 @@ public class UserController {
     }
 
     @GetMapping(value = "/{username}")
-    public ResponseEntity<UserDto> getUser(@PathVariable("username") String username) {
+    public ResponseEntity<UserDto> getUserByUserName(@PathVariable("username") String username) {
 
-        UserDto optionalUser = userService.getUser(username);
+        UserDto optionalUser = userService.getUserByUserName(username);
 
 
         return ResponseEntity.ok().body(optionalUser);
@@ -43,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<UserDto> createKlant(@RequestBody UserDto dto) {
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto dto) {
 
         String encodedPassword = encoder.encode(dto.getPassword());
         dto.setPassword(encodedPassword);
@@ -57,16 +59,18 @@ public class UserController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping(value = "/{username}")
-    public ResponseEntity<UserDto> updateKlant(@PathVariable("username") String username, @RequestBody UserDto dto) {
-
-        userService.updateUser(username, dto);
-
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{username}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable("username") String username, @RequestBody UserUpdateDto dto) {
+        try {
+            userService.updateUser(username, dto);
+            return ResponseEntity.ok().build();
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{username}")
-    public ResponseEntity<Object> deleteKlant(@PathVariable("username") String username) {
+    public ResponseEntity<Object> deleteUser(@PathVariable("username") String username) {
         userService.deleteUser(username);
         return ResponseEntity.noContent().build();
     }
@@ -84,7 +88,7 @@ public class UserController {
             return ResponseEntity.noContent().build();
         }
         catch (Exception ex) {
-            throw new BadRequestException();
+            throw new BadRequestException("Bad request");
         }
     }
 

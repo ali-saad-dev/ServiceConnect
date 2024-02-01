@@ -1,9 +1,9 @@
 package nl.novi.serviceconnect.controllers;
 
+import nl.novi.serviceconnect.exceptions.UsernameNotFoundException;
 import nl.novi.serviceconnect.utils.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,8 +43,8 @@ public class AuthenticationController {
                     new UsernamePasswordAuthenticationToken(username, password)
             );
         }
-        catch (BadCredentialsException ex) {
-            throw new Exception("Incorrect username or password", ex);
+        catch (Exception ex) {
+            throw new UsernameNotFoundException("Incorrect username or password");
         }
 
         final UserDetails userDetails = userDetailsService

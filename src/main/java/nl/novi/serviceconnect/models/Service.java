@@ -28,7 +28,14 @@ public class Service {
     @JoinColumn(name = "category_id")
     @OnDelete(action= OnDeleteAction.SET_NULL)
     private ServiceCategory category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_name")
+    @OnDelete(action= OnDeleteAction.SET_NULL)
+    private User user;
+
     public Service() {}
+
     public Service(Long id, String name, String description, double price, ServiceState state, ServiceCategory serviceCategory) {
         this.id = id;
         this.name = name;
@@ -38,40 +45,32 @@ public class Service {
         this.category = serviceCategory;
     }
     public Long getId() { return id; }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
-
     public double getPrice() {
         return price;
     }
-
     public void setPrice(double price) {
         this.price = price;
     }
-
     public ServiceState getState() {
         return state;
     }
-
     public void setState(ServiceState state) {
         this.state = state;
     }
-
     public ServiceCategory getCategory() { return category; }
-
     public void setCategory(ServiceCategory category) { this.category = category; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

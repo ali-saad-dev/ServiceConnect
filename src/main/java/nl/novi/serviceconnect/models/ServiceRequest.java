@@ -21,21 +21,21 @@ public class ServiceRequest {
     @OneToOne(mappedBy = "serviceRequest")
     private Transaction transaction;
 
+    @ManyToOne
+    @JoinColumn(name="user_name")
+    @OnDelete(action= OnDeleteAction.SET_NULL)
+    private User user;
+
     public Long getId() { return id; }
-
     public String getMessage() { return message; }
-
     public void setMessage(String message) { this.message = message; }
-
     public RequestState getState() { return requestState; }
-
     public void setState(RequestState state) { this.requestState = state; }
-
     public Service getService() { return service; }
-
     public void setService(Service service) { this.service = service; }
-
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

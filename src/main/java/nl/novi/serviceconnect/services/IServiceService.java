@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IServiceService {
 
-    ServiceOutputDto createService(ServiceInputDto serviceInputDto);
+    ServiceOutputDto createService(ServiceInputDto serviceInputDto, String username);
 
     List<ServiceOutputDto> getAllService();
 
