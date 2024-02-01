@@ -72,6 +72,8 @@ public class SpringSecurityConfig {
                                 .requestMatchers(HttpMethod.PUT,"/transaction/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/transaction/**").hasRole("ADMIN")
 
+                                //Query's
+                                .requestMatchers(HttpMethod.GET,"/querys/**").hasRole("ADMIN")
 
                                 //Users
                                 .requestMatchers(HttpMethod.GET,"/users").hasAnyRole("ADMIN")

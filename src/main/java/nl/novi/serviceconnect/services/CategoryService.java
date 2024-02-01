@@ -5,7 +5,7 @@ import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.helpper.Mapper;
 import nl.novi.serviceconnect.models.ServiceCategory;
-import nl.novi.serviceconnect.repository.ServiceCategoryRepository;
+import nl.novi.serviceconnect.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import java.util.Optional;
 @Service
 public class CategoryService implements IServiceCategory {
 
-    private final ServiceCategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    public CategoryService(ServiceCategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
