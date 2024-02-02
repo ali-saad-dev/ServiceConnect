@@ -8,7 +8,7 @@ import nl.novi.serviceconnect.exceptions.UsernameNotFoundException;
 import nl.novi.serviceconnect.helpper.StringHelpers;
 import nl.novi.serviceconnect.models.ServiceCategory;
 import nl.novi.serviceconnect.models.User;
-import nl.novi.serviceconnect.repository.ServiceCategoryRepository;
+import nl.novi.serviceconnect.repository.CategoryRepository;
 import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.helpper.Mapper;
 import nl.novi.serviceconnect.repository.UserRepository;
@@ -19,10 +19,10 @@ import java.util.*;
 @Service
 public class ServiceService implements IServiceService {
     private final ServiceRepository serviceRepository;
-    private final ServiceCategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
-    public ServiceService(ServiceRepository serviceRepo, ServiceCategoryRepository categoryRepository, UserRepository userRepository1) {
+    public ServiceService(ServiceRepository serviceRepo, CategoryRepository categoryRepository, UserRepository userRepository1) {
         this.serviceRepository = serviceRepo;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository1;
