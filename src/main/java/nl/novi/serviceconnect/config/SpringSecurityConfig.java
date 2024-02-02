@@ -59,6 +59,8 @@ public class SpringSecurityConfig {
                                 .requestMatchers(HttpMethod.GET,"/services/**").hasAnyRole("ADMIN","USER")
                                 .requestMatchers(HttpMethod.PUT,"/services/**").hasAnyRole("ADMIN","USER")
                                 .requestMatchers(HttpMethod.DELETE,"/services/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/uploadFileOrImageToService/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/getFileOrImageOfService/**").hasRole("ADMIN")
 
                                 //servicesRequest
                                 .requestMatchers(HttpMethod.POST,"/servicesRequest").hasRole("ADMIN")
