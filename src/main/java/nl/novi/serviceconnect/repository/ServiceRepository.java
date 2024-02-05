@@ -10,4 +10,6 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Query("SELECT c.name AS categoryName, COUNT(s) AS numberOfServices FROM Service s JOIN s.category c GROUP BY c.id")
     List<Object[]> countServicesPerCategory();
+
+   // @Query("SELECT * FROM Service WHERE state = \"Available\"  AND category.id =    ")
 }

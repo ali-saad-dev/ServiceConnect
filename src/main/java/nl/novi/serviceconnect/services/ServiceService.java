@@ -2,16 +2,21 @@ package nl.novi.serviceconnect.services;
 
 import nl.novi.serviceconnect.dtos.ServiceInputDto;
 import nl.novi.serviceconnect.dtos.ServiceOutputDto;
+import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
+import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
 import nl.novi.serviceconnect.exceptions.BadRequestException;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.exceptions.UsernameNotFoundException;
 import nl.novi.serviceconnect.helpper.StringHelpers;
 import nl.novi.serviceconnect.models.ServiceCategory;
+import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.models.User;
 import nl.novi.serviceconnect.repository.CategoryRepository;
 import nl.novi.serviceconnect.repository.ServiceRepository;
 import nl.novi.serviceconnect.helpper.Mapper;
+import nl.novi.serviceconnect.repository.ServiceRequestRepository;
 import nl.novi.serviceconnect.repository.UserRepository;
+import nl.novi.serviceconnect.models.RequestState;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,11 +25,13 @@ import java.util.*;
 public class ServiceService implements IServiceService {
     private final ServiceRepository serviceRepository;
     private final CategoryRepository categoryRepository;
+    private final ServiceRequestRepository serviceRequestRepository;
     private final UserRepository userRepository;
 
-    public ServiceService(ServiceRepository serviceRepo, CategoryRepository categoryRepository, UserRepository userRepository1) {
+    public ServiceService(ServiceRepository serviceRepo, CategoryRepository categoryRepository, ServiceRequestRepository serviceRequestRepository, UserRepository userRepository1) {
         this.serviceRepository = serviceRepo;
         this.categoryRepository = categoryRepository;
+        this.serviceRequestRepository = serviceRequestRepository;
         this.userRepository = userRepository1;
     }
 
@@ -109,5 +116,31 @@ public class ServiceService implements IServiceService {
         } else {
             serviceRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public ServiceRequestOutputDto acceptServiceRequest(ServiceRequestInputDto serviceRequestInputDto, Long id, String username) {
+        ServiceRequest serviceRequestResult = serviceRequestRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("ServiceRequest not found with id: " + id));
+
+        boolean isUsernameInServiceRequest = serviceRequestResult.getUser().getUsername().equals(username);
+
+        boolean isUsernameInService = serviceRequestResult.getService().getUser().getUsername().equals(username);
+
+        boolean isNewStateApprovedOrRejected = serviceRequestInputDto.getState() == RequestState.Approved
+                || serviceRequestInputDto.getState() == RequestState.Rejected || serviceRequestInputDto.getState() == RequestState.Completed;
+
+        boolean isNewStateDeleted = serviceRequestInputDto.getState() == RequestState.Deleted;
+
+        if ((isUsernameInService && isNewStateApprovedOrRejected && !isUsernameInServiceRequest) || (isUsernameInServiceRequest && isNewStateDeleted && !isUsernameInService)) {
+
+            serviceRequestResult.setState(serviceRequestInputDto.getState());
+            serviceRequestResult.setMessage(serviceRequestInputDto.getMessage());
+        }
+        else {
+            throw new BadRequestException("User who created the serviceRequest for his service can't approve serviceRequest, service are only approve it by different user");
+        }
+        serviceRequestRepository.save(serviceRequestResult);
+        return Mapper.fromServiceRequestToDto(serviceRequestResult);
     }
 }

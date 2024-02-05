@@ -75,7 +75,7 @@ public class ServiceRequestService implements IServiceRequest{
         Optional<ServiceRequest> serviceRequestOptional = serviceRequestRepository.findById(id);
 
         ServiceRequest serviceRequest = serviceRequestOptional.orElseThrow(() ->
-                new RecordNotFoundException("No ServiceRequest found with id: " + id));
+                new RecordNotFoundException(" No ServiceRequest found with id: " + id));
 
         return Mapper.fromServiceRequestToDto(serviceRequest);
     }
