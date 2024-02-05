@@ -13,11 +13,15 @@ public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="services_name", length = 128)
+
+    @Column(name="service_name", length = 128)
     private String name;
+
     private String description;
+
     @Column(name="price", length = 128)
     private double price;
+
     @Enumerated(EnumType.STRING)
     private ServiceState state;
 
@@ -33,6 +37,9 @@ public class Service {
     @JoinColumn(name = "user_name")
     @OnDelete(action= OnDeleteAction.SET_NULL)
     private User user;
+
+    @OneToOne(mappedBy = "service")
+    private FileOrImageData fileOrImageData;
 
     public Service() {}
 
@@ -73,4 +80,7 @@ public class Service {
     public void setCategory(ServiceCategory category) { this.category = category; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    public FileOrImageData getFileOrImageData() { return fileOrImageData; }
+    public void setFileOrImageData(FileOrImageData fileOrImageData) { this.fileOrImageData = fileOrImageData; }
+
 }
