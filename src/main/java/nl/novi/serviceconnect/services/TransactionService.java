@@ -3,6 +3,7 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.TransactionInputDto;
 import nl.novi.serviceconnect.dtos.TransactionOutputDto;
 import nl.novi.serviceconnect.dtos.TransactionUpdateDto;
+import nl.novi.serviceconnect.exceptions.BadRequestException;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.helpper.InvoiceGenerator;
@@ -10,10 +11,18 @@ import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.models.Transaction;
 import nl.novi.serviceconnect.repository.ServiceRequestRepository;
 import nl.novi.serviceconnect.repository.TransactionRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import nl.novi.serviceconnect.helpper.Mapper;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -33,10 +42,9 @@ public class TransactionService implements ITransactionService {
             if (!targetDirectory.exists()) {
                 targetDirectory.mkdirs();
             }
-
             String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
 
-            String filePath = targetDirectory.getAbsolutePath() + File.separator + fileName;
+            String filePath = targetDirectory.getPath() + File.separator + fileName ;
 
             return filePath;
         } catch (Exception e) {
@@ -47,21 +55,35 @@ public class TransactionService implements ITransactionService {
 
     @Override
     public TransactionOutputDto createTransaction(TransactionInputDto transactionInputDto) {
-
         Transaction transaction = Mapper.fromDtoToTransaction(transactionInputDto);
 
+        validateServiceRequestId(transactionInputDto);
+
+        ServiceRequest serviceRequest = getServiceRequest(transactionInputDto.getServiceRequestId());
         String filePath = saveFile();
         transaction.setInvoice(filePath);
-
-        ServiceRequest serviceRequest = requestRepository.findById(transactionInputDto.getServiceRequestId())
-                .orElseThrow(() -> new RecordNotFoundException("ServiceRequestId not found with id: " + transactionInputDto.getServiceRequestId()));
         transaction.setServiceRequest(serviceRequest);
 
-        InvoiceGenerator.generateInvoice(serviceRequest);
+        InvoiceGenerator.generateInvoice(serviceRequest, transaction);
 
-       transactionRepository.save(transaction);
+        saveTransaction(transaction);
 
         return Mapper.fromTransactionToDto(transaction);
+    }
+
+    private void validateServiceRequestId(TransactionInputDto transactionInputDto) {
+        if (transactionRepository.existsById(transactionInputDto.getServiceRequestId())) {
+            throw new BadRequestException("ServiceRequestId already exists in the database ServiceRequestId: " + transactionInputDto.getServiceRequestId());
+        }
+    }
+
+    private ServiceRequest getServiceRequest(Long serviceRequestId) {
+        return requestRepository.findById(serviceRequestId)
+                .orElseThrow(() -> new RecordNotFoundException("ServiceRequestId not found with id: " + serviceRequestId));
+    }
+
+    private void saveTransaction(Transaction transaction) {
+        transactionRepository.save(transaction);
     }
 
     @Override
@@ -82,13 +104,31 @@ public class TransactionService implements ITransactionService {
     }
 
     @Override
-    public TransactionOutputDto getTransactionById(Long id) {
+    public ResponseEntity<byte[]> getTransactionById(Long id) {
         Optional<Transaction> transaction = transactionRepository.findById(id);
 
         Transaction result = transaction.orElseThrow(() ->
                 new RecordNotFoundException("No transaction found with id: " + id));
 
-        return Mapper.fromTransactionToDto(result);
+        String invoiceFilePath = result.getInvoice();
+
+        byte[] pdfContent = readPdfFile(invoiceFilePath);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "invoice.pdf");
+
+        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+    }
+
+    private byte[] readPdfFile(String filePath) {
+        try {
+            Path path = Paths.get(filePath);
+            return Files.readAllBytes(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
     }
 
     @Override
@@ -111,6 +151,7 @@ public class TransactionService implements ITransactionService {
                 transaction.getServiceRequest()
         );
     }
+
     @Override
     public void deleteTransaction(Long id) {
         Optional<Transaction> transaction = transactionRepository.findById(id);

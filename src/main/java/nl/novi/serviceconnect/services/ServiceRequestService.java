@@ -43,12 +43,6 @@ public class ServiceRequestService implements IServiceRequest{
         }
         serviceRequestRepository.save(serviceRequestResult);
 
-//        Transaction transaction = new Transaction();
-//        transaction.setTransactionDate(new Date());
-//        transaction.setPayed(false);
-//        serviceRequestResult.setTransaction(transaction);
-
-
         return Mapper.fromServiceRequestToDto(serviceRequestResult);
     }
 

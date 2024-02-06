@@ -29,21 +29,27 @@ public class TransactionController {
         if (br.hasFieldErrors()) return getObjectResponseEntity(br);
 
         TransactionOutputDto outputDto = TransactionService.createTransaction(inputDto);
+
         URI uri = URI.create(
                 ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/" + outputDto.id).toUriString());
         return ResponseEntity.created(uri).body(outputDto);
     }
+
     @GetMapping
     public ResponseEntity<List<TransactionOutputDto>> getAllTransaction() {
         return ResponseEntity.ok(TransactionService.getAllTransaction());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TransactionOutputDto> getTransactionById(@PathVariable Long id) {
-        TransactionOutputDto transaction = TransactionService.getTransactionById(id);
-        return ResponseEntity.ok(transaction);
+    public ResponseEntity<byte[]> getTransactionById(@PathVariable Long id) {
+        try {
+            ResponseEntity<byte[]> responseEntity = TransactionService.getTransactionById(id);
+            return responseEntity;
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
