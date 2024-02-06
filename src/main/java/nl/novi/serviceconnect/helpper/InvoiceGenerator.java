@@ -1,6 +1,7 @@
 package nl.novi.serviceconnect.helpper;
 
 import nl.novi.serviceconnect.models.ServiceRequest;
+import nl.novi.serviceconnect.models.Transaction;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -15,7 +16,8 @@ import java.nio.file.Paths;
 
 
 public class InvoiceGenerator {
-    public static String generateInvoice(ServiceRequest serviceRequest) {
+
+    public static String generateInvoice(ServiceRequest serviceRequest, Transaction transaction) {
         try {
             String directoryPath = "invoicesPdf";
 
@@ -32,7 +34,7 @@ public class InvoiceGenerator {
             PDPage page = new PDPage(PDRectangle.A4);
             document.addPage(page);
 
-            generateInvoiceContent(document, serviceRequest);
+            generateInvoiceContent(document, serviceRequest, transaction);
 
             document.save(filePath);
             document.close();
@@ -44,42 +46,91 @@ public class InvoiceGenerator {
         }
     }
 
-    private static void generateInvoiceContent(PDDocument document, ServiceRequest serviceRequest) throws IOException {
-
+    private static void generateInvoiceContent(PDDocument document, ServiceRequest serviceRequest, Transaction transaction) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(0));
 
         contentStream.beginText();
-
         contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
 
         float margin = 50;
-        float yStart = document.getPage(0).getMediaBox().getHeight() - margin;
-        float yPosition = yStart;
+        float yPosition = document.getPage(0).getMediaBox().getHeight() - margin;
         float marginY = 20;
 
-        contentStream.newLineAtOffset(margin, yPosition);
-        contentStream.showText("Invoice");
-        yPosition -= marginY;
 
-        contentStream.newLineAtOffset(0, -marginY);
-        contentStream.showText("Service Request ID: " + serviceRequest.getId());
-        yPosition -= marginY;
 
+        String title = "Service Connect Invoice";
+        float titleWidth = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD).getStringWidth(title) / 1000 * 12;
+        float titlePosition = (document.getPage(0).getMediaBox().getWidth() - titleWidth) / 2;
+        contentStream.newLineAtOffset(titlePosition, yPosition);
+        contentStream.showText(title);
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+        contentStream.newLineAtOffset(margin,yPosition - marginY);
+        contentStream.showText("Date: " + transaction.getTransactionDate());
         contentStream.newLineAtOffset(0, -marginY);
+        contentStream.showText("Invoice #: " + serviceRequest.getId());
+        contentStream.newLineAtOffset(0, -marginY);
+
+
+        contentStream.endText();
+        contentStream.moveTo(margin, yPosition - 3 * marginY);
+        contentStream.lineTo(document.getPage(0).getMediaBox().getWidth() - margin, yPosition - 3 * marginY);
+        contentStream.stroke();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(margin, yPosition - 4 * marginY);
+
+
+        contentStream.showText("From: " + serviceRequest.getService().getUser().getUsername());
+        contentStream.newLineAtOffset(0, -marginY);
+        contentStream.showText("To: " + serviceRequest.getUser().getUsername());
+
+
+        contentStream.endText();
+        contentStream.moveTo(margin, yPosition - 8 * marginY);
+        contentStream.lineTo(document.getPage(0).getMediaBox().getWidth() - margin, yPosition - 8 * marginY);
+        contentStream.stroke();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(margin, yPosition - 9 * marginY);
+
         contentStream.showText("Service Name: " + serviceRequest.getService().getName());
-        yPosition -= marginY;
-
-        contentStream.newLineAtOffset(0, -marginY);
-        contentStream.showText("Message: " + serviceRequest.getMessage());
-        yPosition -= marginY;
-
         contentStream.newLineAtOffset(0, -marginY);
         contentStream.showText("Service Description: " + serviceRequest.getService().getDescription());
-        yPosition -= marginY;
+        contentStream.newLineAtOffset(0, -marginY);
+        contentStream.showText("Service Category: " + serviceRequest.getService().getCategory().getName());
+        contentStream.newLineAtOffset(0, -marginY);
+        contentStream.showText("Service Price: " + serviceRequest.getService().getPrice());
 
+
+        contentStream.endText();
+        contentStream.moveTo(margin, yPosition - 13 * marginY);
+        contentStream.lineTo(document.getPage(0).getMediaBox().getWidth() - margin, yPosition - 13 * marginY);
+        contentStream.stroke();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(margin, yPosition - 14 * marginY);
+
+
+        contentStream.showText("Subtotal: " + serviceRequest.getService().getPrice());
+        contentStream.newLineAtOffset(0, -marginY);
+        contentStream.showText("Tax: " + "0");
         contentStream.newLineAtOffset(0, -marginY);
         contentStream.showText("Total Amount: " + serviceRequest.getService().getPrice());
-        yPosition -= marginY;
+
+
+        contentStream.endText();
+        contentStream.moveTo(margin, yPosition - 17 * marginY);
+        contentStream.lineTo(document.getPage(0).getMediaBox().getWidth() - margin, yPosition - 17 * marginY);
+        contentStream.stroke();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(margin, yPosition - 18 * marginY);
+
+
+        contentStream.showText("Notes: Thank you for using our Service connect");
 
         contentStream.endText();
         contentStream.close();

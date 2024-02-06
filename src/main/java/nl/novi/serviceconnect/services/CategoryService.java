@@ -5,10 +5,12 @@ import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.helpper.Mapper;
 import nl.novi.serviceconnect.models.ServiceCategory;
+import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +38,8 @@ public class CategoryService implements IServiceCategory {
         if (CategoriesList.isEmpty()) {
             throw new RecordNotFoundException("No categories found");
         }
+
+        CategoriesList.sort(Comparator.comparing(ServiceCategory::getId));
 
         for(ServiceCategory category : CategoriesList) {
             outputDto.add(Mapper.fromCategoryToDto(category));

@@ -30,20 +30,11 @@ INSERT INTO service_request (service_id, message, request_State,user_name) VALUE
 (6, 'Require legal consultation for a real estate matter. Please advise on availability.', 'Pending', 'user');
 
 --transaction table
-INSERT INTO transaction (service_request_id, transaction_date, is_payed, invoice) VALUES (1, '2024-01-15', true, 'LesOpdrachten\\EindProject\\ServiceConnect\\invoicesPdf\\invoice_1706085619924.pdf'),
- (2, '2024-01-16', false, NULL), -- Transaction not yet paid
- (3, '2024-01-17', true, 'LesOpdrachten\\EindProject\\ServiceConnect\\invoicesPdf\\invoice_1706085623456.pdf'),
- (4, '2024-01-18', false, NULL), -- Transaction not yet paid
- (5, '2024-01-19', true, 'LesOpdrachten\\EindProject\\ServiceConnect\\invoicesPdf\\invoice_1706085627890.pdf'),
- (6, '2024-01-20', true, 'LesOpdrachten\\EindProject\\ServiceConnect\\invoicesPdf\\invoice_1706085631234.pdf');
-
---Service-file-or-image-data table
--- INSERT INTO service_file_or_image_data (service-id, name, type, file_or_image_data) VALUES (1,'image1.png', 'image/png', '59066'),
--- (2,'image2.png', 'image/png', '59077'),
--- (3,'pdf1.pdf', 'application/pdf', '59088'),
--- (4,'pdf2.pdf', 'application/pdf', '59099');
-
---10 unit test voor en 2 service testen, en 2 integration test
---proberen design pattern te implementeren
+INSERT INTO transaction (service_request_id, transaction_date, is_payed, invoice) VALUES (1, '2024-01-15', true, 'invoicesPdf\invoice_1707211320385.pdf'),
+ (2, '2024-01-16', true, 'invoicesPdf\invoice_1707211384761.pdf'),
+ (3, '2024-01-17', true, 'invoicesPdf\invoice_1707211545604.pdf'),
+ (4, '2024-01-18', false, 'invoicesPdf\invoice_1707211563784.pdf'),
+ (5, '2024-01-19', true, 'invoicesPdf\invoice_1707211579981.pdf'),
+ (6, '2024-01-20', false, 'invoicesPdf\invoice_1707211636003.pdf');
 
 
