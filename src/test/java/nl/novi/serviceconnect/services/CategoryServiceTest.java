@@ -59,7 +59,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    public void whenNOCategoriesReturnNoCategoriesFound() {
+    public void whenNoCategoriesReturn_NoCategoriesFound() {
 
         //Act
         when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
