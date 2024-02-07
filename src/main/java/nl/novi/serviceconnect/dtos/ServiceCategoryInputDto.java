@@ -12,4 +12,9 @@ public class ServiceCategoryInputDto {
     private String description;
     public String getName() { return name; }
     public String getDescription() { return description; }
+
+    public ServiceCategoryInputDto(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }

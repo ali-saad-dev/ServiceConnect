@@ -35,7 +35,7 @@ public class TransactionService implements ITransactionService {
         this.requestRepository = requestRepository;
     }
 
-    private String saveFile() {
+    public String saveFile() {
         try {
             File targetDirectory = new File("invoicesPdf");
 
@@ -47,9 +47,9 @@ public class TransactionService implements ITransactionService {
             String filePath = targetDirectory.getPath() + File.separator + fileName ;
 
             return filePath;
-        } catch (Exception e) {
+        } catch (BadRequestException e) {
 
-            throw new RuntimeException("Error generating and saving PDF file", e);
+            throw new BadRequestException("Error generating and saving PDF file");
         }
     }
 
@@ -71,18 +71,18 @@ public class TransactionService implements ITransactionService {
         return Mapper.fromTransactionToDto(transaction);
     }
 
-    private void validateServiceRequestId(TransactionInputDto transactionInputDto) {
+    public void validateServiceRequestId(TransactionInputDto transactionInputDto) {
         if (transactionRepository.existsById(transactionInputDto.getServiceRequestId())) {
             throw new BadRequestException("ServiceRequestId already exists in the database ServiceRequestId: " + transactionInputDto.getServiceRequestId());
         }
     }
 
-    private ServiceRequest getServiceRequest(Long serviceRequestId) {
+    public ServiceRequest getServiceRequest(Long serviceRequestId) {
         return requestRepository.findById(serviceRequestId)
                 .orElseThrow(() -> new RecordNotFoundException("ServiceRequestId not found with id: " + serviceRequestId));
     }
 
-    private void saveTransaction(Transaction transaction) {
+    public void saveTransaction(Transaction transaction) {
         transactionRepository.save(transaction);
     }
 

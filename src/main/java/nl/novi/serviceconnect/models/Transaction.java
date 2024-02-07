@@ -28,37 +28,32 @@ public class Transaction {
         this.invoice = invoice;
         this.serviceRequest = serviceRequest;
     }
+
+    public void setId(Long id) {this.id = id; }
     public Long getId() {
         return id;
     }
     public Date getTransactionDate() {
         return transactionDate;
     }
-
     public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
-
     public boolean getPayed() {
         return isPayed;
     }
-
     public void setPayed(boolean isPayed) {
         this.isPayed = isPayed;
     }
-
     public String getInvoice() {
         return invoice;
     }
-
     public void setInvoice(String invoice) {
         this.invoice = invoice;
     }
-
     public ServiceRequest getServiceRequest() {
         return serviceRequest;
     }
-
     public void setServiceRequest(ServiceRequest serviceRequest) {
         this.serviceRequest = serviceRequest;
     }
