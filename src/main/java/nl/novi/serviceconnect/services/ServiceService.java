@@ -60,6 +60,7 @@ public class ServiceService implements IServiceService {
 
     @Override
     public List<ServiceOutputDto> getAllService() {
+
         List<nl.novi.serviceconnect.models.Service> serviceList = serviceRepository.findAll();
         List<ServiceOutputDto> serviceOutputDtos = new ArrayList<>();
 

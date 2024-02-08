@@ -46,40 +46,38 @@ public class SpringSecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
                         auth
-                                 //.requestMatchers("/**").permitAll()
-
                                 //serviceCategory
                                 .requestMatchers(HttpMethod.POST,"/serviceCategory").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/serviceCategory/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/serviceCategory/**").hasAnyRole("ADMIN","USER")
                                 .requestMatchers(HttpMethod.PUT,"/serviceCategory/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/serviceCategory/**").hasRole("ADMIN")
 
                                 //service
-                                .requestMatchers(HttpMethod.POST,"/services").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/services").hasAnyRole("ADMIN","USER")
                                 .requestMatchers(HttpMethod.GET,"/services/**").hasAnyRole("ADMIN","USER")
                                 .requestMatchers(HttpMethod.PUT,"/services/**").hasAnyRole("ADMIN","USER")
-                                .requestMatchers(HttpMethod.DELETE,"/services/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/uploadFileOrImageToService/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/getFileOrImageOfService/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/services/**").hasAnyRole("ADMIN","USER")
+                                .requestMatchers(HttpMethod.POST,"/uploadFileOrImageToService/**").hasAnyRole("ADMIN","USER")
+                                .requestMatchers(HttpMethod.GET,"/getFileOrImageOfService/**").hasAnyRole("ADMIN","USER")
 
                                 //servicesRequest
-                                .requestMatchers(HttpMethod.POST,"/servicesRequest").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/servicesRequest").hasAnyRole("ADMIN","USER")
                                 .requestMatchers(HttpMethod.GET,"/servicesRequest/**").hasAnyRole("ADMIN","USER")
-                                .requestMatchers(HttpMethod.PUT,"/servicesRequest/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,"/servicesRequest/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/servicesRequest/**").hasAnyRole("ADMIN","USER")
+                                .requestMatchers(HttpMethod.DELETE,"/servicesRequest/**").hasAnyRole("ADMIN","USER")
 
                                 //transaction
-                                .requestMatchers(HttpMethod.POST,"/transaction").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/transaction/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.PUT,"/transaction/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,"/transaction/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/transaction").hasAnyRole("ADMIN","USER")
+                                .requestMatchers(HttpMethod.GET,"/transaction/**").hasAnyRole("ADMIN","USER")
+                                .requestMatchers(HttpMethod.PUT,"/transaction/**").hasAnyRole("ADMIN","USER")
+                                .requestMatchers(HttpMethod.DELETE,"/transaction/**").hasAnyRole("ADMIN","USER")
 
                                 //Query's
                                 .requestMatchers(HttpMethod.GET,"/querys/**").hasRole("ADMIN")
 
                                 //Users
                                 .requestMatchers(HttpMethod.GET,"/users").hasAnyRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/users/{username}/**").hasAnyRole("USER","ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/users/{username}/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/users/{username}/authorities/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")

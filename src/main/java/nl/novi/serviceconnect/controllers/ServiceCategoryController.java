@@ -3,8 +3,6 @@ package nl.novi.serviceconnect.controllers;
 import jakarta.validation.Valid;
 import nl.novi.serviceconnect.dtos.ServiceCategoryInputDto;
 import nl.novi.serviceconnect.dtos.ServiceCategoryOutputDto;
-import nl.novi.serviceconnect.dtos.ServiceRequestInputDto;
-import nl.novi.serviceconnect.dtos.ServiceRequestOutputDto;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.services.IServiceCategory;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +18,13 @@ import static nl.novi.serviceconnect.helpper.StringHelpers.getObjectResponseEnti
 @RestController
 @RequestMapping("/serviceCategory")
 public class ServiceCategoryController {
+
     private final IServiceCategory serviceCategory;
 
     public ServiceCategoryController(IServiceCategory serviceCategory) { this.serviceCategory = serviceCategory; }
 
     @PostMapping
-    public ResponseEntity<Object> createServiceRequest(@Valid @RequestBody ServiceCategoryInputDto inputDto, BindingResult br) {
+    public ResponseEntity<Object> createCategory(@Valid @RequestBody ServiceCategoryInputDto inputDto, BindingResult br) {
 
         if (br.hasFieldErrors()) {
             return getObjectResponseEntity(br);
