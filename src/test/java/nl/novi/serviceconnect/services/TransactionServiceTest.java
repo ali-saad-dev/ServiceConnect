@@ -3,7 +3,7 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.TransactionInputDto;
 import nl.novi.serviceconnect.dtos.TransactionUpdateDto;
 import nl.novi.serviceconnect.dtos.TransactionOutputDto;
-import nl.novi.serviceconnect.exceptions.BadRequestException;
+import nl.novi.serviceconnect.exceptions.FileAlreadyUploadedException;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.models.Transaction;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionServiceTest {
+public class TransactionServiceTest {
 
     @Mock
     TransactionRepository transactionRepository;
@@ -37,13 +37,12 @@ class TransactionServiceTest {
 
     @Test
     public void shouldGetServiceRequest() {
-
         //Arrange
         ServiceRequest mockServiceRequest = new ServiceRequest();
         mockServiceRequest.setId(1L);
+        when(serviceRequestRepository.findById(1L)).thenReturn(Optional.of(mockServiceRequest));
 
         //Act
-        when(serviceRequestRepository.findById(1L)).thenReturn(Optional.of(mockServiceRequest));
         ServiceRequest result = transactionService.getServiceRequest(1L);
 
         //Assert
@@ -52,38 +51,36 @@ class TransactionServiceTest {
     }
 
     @Test
-    public void shouldSaveFile_Success() {
-
+    public void shouldGetFilePath_Success() {
         //Arrange
         String fileSeparator = File.separator;
+        String expectedFilePathPrefix = "invoicesPdf" + fileSeparator + "invoice_";
 
         //Act
-        String filePath = transactionService.saveFile();
-        String expectedFilePathPrefix = "invoicesPdf" + fileSeparator + "invoice_";
+        String filePath = transactionService.getFilePath();
+
 
         //Assert
         assertTrue(filePath.startsWith(expectedFilePathPrefix), "File path should start with: " + expectedFilePathPrefix);
     }
 
     @Test
-    public void shouldGetServiceRequestNonExistingId() {
-
-        //Act
+    public void shouldThrowException_NoServiceRequestId() {
+        //Arrange
         when(serviceRequestRepository.findById(2L)).thenReturn(Optional.empty());
 
-        //Assert
+        //Act & Assert
         assertThrows(RecordNotFoundException.class, () -> transactionService.getServiceRequest(2L));
     }
 
     @Test
     public void shouldGetAllTransaction() {
-
         //Arrange
         Transaction mockTransaction = new Transaction();
         mockTransaction.setId(1L);
+        when(transactionRepository.findAll()).thenReturn(Collections.singletonList(mockTransaction));
 
         //Act
-        when(transactionRepository.findAll()).thenReturn(Collections.singletonList(mockTransaction));
         List<TransactionOutputDto> outputDtoList = transactionService.getAllTransaction();
 
         //Assert
@@ -93,46 +90,42 @@ class TransactionServiceTest {
 
     @Test
     public void testGetAllTransaction_NoTransactionsFound() {
-
-        //Act
+        //Arrange
         when(transactionRepository.findAll()).thenReturn(new ArrayList<>());
 
-        //Assert
+        //Act & Assert
         assertThrows(RecordNotFoundException.class, () -> transactionService.getAllTransaction());
     }
 
     @Test
     public void shouldGetTransactionById() {
-
         //Arrange
         Transaction mockTransaction = new Transaction();
         mockTransaction.setId(1L);
         mockTransaction.setInvoice("invoice.pdf");
+        when(transactionRepository.findById(1L)).thenReturn(Optional.of(mockTransaction));
 
         //Act
-        when(transactionRepository.findById(1L)).thenReturn(Optional.of(mockTransaction));
         ResponseEntity<byte[]> responseEntity = transactionService.getTransactionById(1L);
 
         //Assert
         assertNotNull(responseEntity);
         assertNotNull(responseEntity.getBody());
-        assertEquals("invoice.pdf", responseEntity.getHeaders().getContentDisposition().getFilename());
+        assertEquals(responseEntity.getHeaders().getContentDisposition().getFilename(), mockTransaction.getInvoice());
     }
 
     @Test
     public void testCreateTransaction_InvalidServiceRequestId() {
-
-        //Act
+        //Arrange
         TransactionInputDto inputDto = new TransactionInputDto(new Date(2024-5-16),true,1L);
 
-        //Assert
+        //Act & Assert
         assertThrows(RecordNotFoundException.class, () -> transactionService.createTransaction(inputDto));
         verify(transactionRepository, never()).save(any(Transaction.class));
     }
 
     @Test
     public void shouldSaveTransaction() {
-
         //Arrange
         Transaction mockTransaction = new Transaction();
         mockTransaction.setId(1L);
@@ -146,17 +139,15 @@ class TransactionServiceTest {
 
     @Test
     public void whenNoTransactionFoundShouldReturn_TransactionNotFound() {
-
-        //Act
+        //Arrange
         when(transactionRepository.findById(1L)).thenReturn(Optional.empty());
 
-        //Assert
+        //Act & Assert
         assertThrows(RecordNotFoundException.class, () -> transactionService.getTransactionById(1L));
     }
 
     @Test
     public void shouldUpdateTransaction() {
-
         //Arrange
         TransactionUpdateDto inputDto = new TransactionUpdateDto();
         inputDto.setPayed(true);
@@ -164,9 +155,9 @@ class TransactionServiceTest {
 
         Transaction existingTransaction = new Transaction();
         existingTransaction.setId(1L);
+        when(transactionRepository.findById(1L)).thenReturn(Optional.of(existingTransaction));
 
         //Act
-        when(transactionRepository.findById(1L)).thenReturn(Optional.of(existingTransaction));
         TransactionOutputDto outputDto = transactionService.updateTransaction(1L, inputDto);
 
         //Assert
@@ -177,54 +168,41 @@ class TransactionServiceTest {
 
     @Test
     public void shouldValidateServiceRequestId_ServiceRequestIdExists() {
-
         //Arrange
         when(transactionRepository.existsById(1L)).thenReturn(true);
-
-        //Act
         TransactionInputDto inputDto = new TransactionInputDto(new Date(2024-5-16),true,1L);
 
-
-        //Assert
-        assertThrows(BadRequestException.class, () -> transactionService.validateServiceRequestId(inputDto));
+        //Act & Assert
+        assertThrows(FileAlreadyUploadedException.class, () -> transactionService.validateServiceRequestId(inputDto));
     }
 
     @Test
     public void shouldValidateServiceRequestId_ServiceRequestIdDoesNotExist() {
-
         //Arrange
+        TransactionInputDto inputDto = new TransactionInputDto(new Date(2024-5-16),false,1L);
         when(transactionRepository.existsById(1L)).thenReturn(false);
 
-        //Act
-        TransactionInputDto inputDto = new TransactionInputDto(new Date(2024-5-16),false,1L);
-
-        //Assert
+        //Act & Assert
         assertDoesNotThrow(() -> transactionService.validateServiceRequestId(inputDto));
     }
 
     @Test
     public void shouldDeleteTransaction() {
-
         //Arrange
         Transaction mockTransaction = new Transaction();
-
-        //Act
         when(transactionRepository.findById(1L)).thenReturn(Optional.of(mockTransaction));
 
-        //Assert
+        //Act & Assert
         assertDoesNotThrow(() -> transactionService.deleteTransaction(1L));
     }
 
     @Test
     public void whenDeleteTransaction_TransactionNotFound() {
-
         //Arrange
         when(transactionRepository.findById(1L)).thenReturn(Optional.empty());
 
-        //Act
-        assertThrows(RecordNotFoundException.class, () -> transactionService.deleteTransaction(1L));
-
-        //Assert
+        //Act & Assert
         verify(transactionRepository, never()).deleteById(1L);
+        assertThrows(RecordNotFoundException.class, () -> transactionService.deleteTransaction(1L));
     }
 }

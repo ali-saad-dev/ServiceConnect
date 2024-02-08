@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class QueryServiceTest {
+public class QueryServiceTest {
 
     @Mock
     ServiceRepository serviceRepository;
@@ -33,18 +33,17 @@ class QueryServiceTest {
 
     @Test
     public void countServicesPerCategory() {
-
-        // Arrange
+        //Arrange
         List<Object[]> mockResult = new ArrayList<>();
         mockResult.add(new Object[]{"Category1", 5L});
         mockResult.add(new Object[]{"Category2", 3L});
         mockResult.add(new Object[]{"Category3", 7L});
         when(serviceRepository.countServicesPerCategory()).thenReturn(mockResult);
 
-        // Act
+        //Act
         List<CategoryServiceCountDto> result = queryService.countServicesPerCategory();
 
-        // Assert
+        //Assert
         assertNotNull(result);
         assertEquals(3, result.size());
 
@@ -60,8 +59,7 @@ class QueryServiceTest {
 
     @Test
     public void shouldSearchServicesByPrice() {
-
-        // Arrange
+        //Arrange
         Long categoryId = 1L;
         Double minPrice = 50.0;
         Double maxPrice = 100.0;
@@ -71,10 +69,10 @@ class QueryServiceTest {
         mockServiceList.add(new Service(2L,"Service2","test description",80.0, ServiceState.Available, categoryRepository.getReferenceById(2L)));
         when(serviceRepository.searchServicesByPrice(categoryId, minPrice, maxPrice)).thenReturn(mockServiceList);
 
-        // Act
+        //Act
         List<ServiceOutputDto> result = queryService.searchServicesByPrice(categoryId, minPrice, maxPrice);
 
-        // Assert
+        //Assert
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("Service1", result.get(0).name);
@@ -85,14 +83,13 @@ class QueryServiceTest {
 
     @Test
     public void SearchServicesByPrice_NoServicesFound() {
-
-        // Arrange
+        //Arrange
         Long categoryId = 1L;
         Double minPrice = 50.0;
         Double maxPrice = 100.0;
         when(serviceRepository.searchServicesByPrice(categoryId, minPrice, maxPrice)).thenReturn(new ArrayList<>());
 
-        // Act & Assert
+        //Act & Assert
         assertThrows(RecordNotFoundException.class, () -> queryService.searchServicesByPrice(categoryId, minPrice, maxPrice));
     }
 }
