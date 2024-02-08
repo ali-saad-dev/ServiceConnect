@@ -18,4 +18,10 @@ public class TransactionInputDto {
     public Long getServiceRequestId() {
         return serviceRequestId;
     }
+
+    public TransactionInputDto(Date transactionDate, boolean isPayed, Long serviceRequestId) {
+        this.transactionDate = transactionDate;
+        this.isPayed = isPayed;
+        this.serviceRequestId = serviceRequestId;
+    }
 }

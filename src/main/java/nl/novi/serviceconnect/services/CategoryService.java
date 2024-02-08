@@ -5,7 +5,6 @@ import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.helpper.Mapper;
 import nl.novi.serviceconnect.models.ServiceCategory;
-import nl.novi.serviceconnect.models.ServiceRequest;
 import nl.novi.serviceconnect.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 

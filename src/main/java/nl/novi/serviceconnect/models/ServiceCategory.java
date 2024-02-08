@@ -47,4 +47,11 @@ public class ServiceCategory {
     public void setServices(List<Service> services) {
         this.services = services;
     }
+
+    public ServiceCategory() {}
+
+    public ServiceCategory(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }
