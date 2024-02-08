@@ -3,7 +3,7 @@ package nl.novi.serviceconnect.services;
 import nl.novi.serviceconnect.dtos.TransactionInputDto;
 import nl.novi.serviceconnect.dtos.TransactionOutputDto;
 import nl.novi.serviceconnect.dtos.TransactionUpdateDto;
-import nl.novi.serviceconnect.exceptions.BadRequestException;
+import nl.novi.serviceconnect.exceptions.FileAlreadyUploadedException;
 import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
 import nl.novi.serviceconnect.helpper.Helpers;
 import nl.novi.serviceconnect.helpper.InvoiceGenerator;
@@ -35,8 +35,8 @@ public class TransactionService implements ITransactionService {
         this.requestRepository = requestRepository;
     }
 
-    public String saveFile() {
-        try {
+    public String getFilePath() {
+
             File targetDirectory = new File("invoicesPdf");
 
             if (!targetDirectory.exists()) {
@@ -44,13 +44,7 @@ public class TransactionService implements ITransactionService {
             }
             String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
 
-            String filePath = targetDirectory.getPath() + File.separator + fileName ;
-
-            return filePath;
-        } catch (BadRequestException e) {
-
-            throw new BadRequestException("Error generating and saving PDF file");
-        }
+        return targetDirectory.getPath() + File.separator + fileName;
     }
 
     @Override
@@ -60,7 +54,7 @@ public class TransactionService implements ITransactionService {
         validateServiceRequestId(transactionInputDto);
 
         ServiceRequest serviceRequest = getServiceRequest(transactionInputDto.getServiceRequestId());
-        String filePath = saveFile();
+        String filePath = getFilePath();
         transaction.setInvoice(filePath);
         transaction.setServiceRequest(serviceRequest);
 
@@ -73,7 +67,7 @@ public class TransactionService implements ITransactionService {
 
     public void validateServiceRequestId(TransactionInputDto transactionInputDto) {
         if (transactionRepository.existsById(transactionInputDto.getServiceRequestId())) {
-            throw new BadRequestException("ServiceRequestId already exists in the database ServiceRequestId: " + transactionInputDto.getServiceRequestId());
+            throw new FileAlreadyUploadedException("ServiceRequestId already exists in the database ServiceRequestId: " + transactionInputDto.getServiceRequestId());
         }
     }
 
