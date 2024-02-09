@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 
 public class InvoiceGenerator {
 
-    public static String generateInvoice(ServiceRequest serviceRequest, Transaction transaction) {
+    public static void generateInvoice(ServiceRequest serviceRequest, Transaction transaction) {
         try {
             String directoryPath = "invoicesPdf";
 
@@ -26,7 +26,7 @@ public class InvoiceGenerator {
                 directory.toFile().mkdirs();
             }
 
-            String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
+            String fileName = "invoice-" + serviceRequest.getId() + ".pdf";
 
             String filePath = Paths.get(directoryPath, fileName).toString();
 
@@ -39,10 +39,8 @@ public class InvoiceGenerator {
             document.save(filePath);
             document.close();
 
-            return filePath;
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
     }
 

@@ -25,7 +25,7 @@ public class FileOrImageDataService implements IFileOrImageDataService {
     }
 
     @Override
-    public String uploadFileOrImage(MultipartFile multipartFile, Long id) throws IOException {
+    public void uploadFileOrImage(MultipartFile multipartFile, Long id) throws IOException {
         Optional<nl.novi.serviceconnect.models.Service> serviceOptional = serviceRepository.findById(id);
 
         if (serviceOptional.isEmpty()) {
@@ -54,13 +54,6 @@ public class FileOrImageDataService implements IFileOrImageDataService {
         service.setFileOrImageData(fileOrImageData);
         serviceRepository.save(service);
 
-        return savedFileOrImage.getName();
-    }
-
-    private boolean isFileAlreadyUploaded(String fileName) {
-        Optional<FileOrImageData> existingFile = fileOrImageDataRepository.findByName(fileName);
-
-        return existingFile.isPresent();
     }
 
     @Override
@@ -72,5 +65,11 @@ public class FileOrImageDataService implements IFileOrImageDataService {
         FileOrImageData fileOrImageData = service1.getFileOrImageData();
 
         return FileOrImageDataUtil.decompressFileOrImage(fileOrImageData.getFileOrImageData());
+    }
+
+    private boolean isFileAlreadyUploaded(String fileName) {
+        Optional<FileOrImageData> existingFile = fileOrImageDataRepository.findByName(fileName);
+
+        return existingFile.isPresent();
     }
 }

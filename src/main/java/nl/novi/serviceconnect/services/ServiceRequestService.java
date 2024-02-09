@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class ServiceRequestService implements IServiceRequest{
+public class ServiceRequestService implements IServiceRequest {
+
     private final ServiceRequestRepository serviceRequestRepository;
     private final ServiceRepository serviceRepository;
     private final UserRepository userRepository;
@@ -49,7 +50,7 @@ public class ServiceRequestService implements IServiceRequest{
     @Override
     public List<ServiceRequestOutputDto> getAllServiceRequests() {
         List<ServiceRequest> serviceRequestList = serviceRequestRepository.findAll();
-        List<ServiceRequestOutputDto> requestOutputDtos = new ArrayList<>();
+        List<ServiceRequestOutputDto> requestOutputDto = new ArrayList<>();
 
         if (serviceRequestList.isEmpty()) {
             throw new RecordNotFoundException("No ServiceRequests found");
@@ -58,10 +59,10 @@ public class ServiceRequestService implements IServiceRequest{
         serviceRequestList.sort(Comparator.comparing(ServiceRequest::getId));
 
         for(ServiceRequest serviceRequest : serviceRequestList) {
-            requestOutputDtos.add(Mapper.fromServiceRequestToDto(serviceRequest));
+            requestOutputDto.add(Mapper.fromServiceRequestToDto(serviceRequest));
         }
 
-        return requestOutputDtos;
+        return requestOutputDto;
     }
 
     @Override
@@ -73,6 +74,7 @@ public class ServiceRequestService implements IServiceRequest{
 
         return Mapper.fromServiceRequestToDto(serviceRequest);
     }
+
     @Override
     public ServiceRequestOutputDto updateServiceRequest(Long id, ServiceRequestInputDto inputDto) {
         ServiceRequest existingService = serviceRequestRepository.findById(id)
@@ -85,6 +87,15 @@ public class ServiceRequestService implements IServiceRequest{
         return Mapper.fromServiceRequestToDto(existingService);
     }
 
+    @Override
+    public void deleteServiceRequest(Long id) {
+        Optional<ServiceRequest> optionalServiceRequest = serviceRequestRepository.findById(id);
+
+        if (optionalServiceRequest.isEmpty()) throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
+
+        serviceRequestRepository.deleteById(id);
+    }
+
     private void updateServiceFields(ServiceRequest serviceRequest, ServiceRequestInputDto inputDto) {
 
         if (Helpers.isNotNullOrEmpty(inputDto.getMessage())) {
@@ -93,13 +104,5 @@ public class ServiceRequestService implements IServiceRequest{
         if ((inputDto.getState()!=null)) {
             serviceRequest.setState(inputDto.getState());
         }
-    }
-    @Override
-    public void deleteServiceRequest(Long id) {
-        Optional<ServiceRequest> optionalServiceRequest = serviceRequestRepository.findById(id);
-
-        if (optionalServiceRequest.isEmpty()) throw new RecordNotFoundException("ServiceRequest with id " + id + " not found");
-
-        serviceRequestRepository.deleteById(id);
     }
 }

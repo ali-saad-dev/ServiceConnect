@@ -13,10 +13,13 @@ import java.util.Set;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final UserService userService;
+
     public CustomUserDetailsService(UserService service) {
         this.userService = service;
     }
+
     @Override
     public UserDetails loadUserByUsername(String username) {
         UserDto userDto = userService.getUserByUserName(username);

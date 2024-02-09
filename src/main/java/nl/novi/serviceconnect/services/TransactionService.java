@@ -27,22 +27,24 @@ import java.util.*;
 
 @Service
 public class TransactionService implements ITransactionService {
+
     private final TransactionRepository transactionRepository;
 
     private final ServiceRequestRepository requestRepository;
+
     public TransactionService(TransactionRepository repository, ServiceRequestRepository requestRepository) {
         this.transactionRepository = repository;
         this.requestRepository = requestRepository;
     }
 
-    public String getFilePath() {
+    public String getFilePath(ServiceRequest serviceRequest) {
 
             File targetDirectory = new File("invoicesPdf");
 
             if (!targetDirectory.exists()) {
                 targetDirectory.mkdirs();
             }
-            String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
+            String fileName = "invoice-" + serviceRequest.getId() + ".pdf";
 
         return targetDirectory.getPath() + File.separator + fileName;
     }
@@ -54,7 +56,7 @@ public class TransactionService implements ITransactionService {
         validateServiceRequestId(transactionInputDto);
 
         ServiceRequest serviceRequest = getServiceRequest(transactionInputDto.getServiceRequestId());
-        String filePath = getFilePath();
+        String filePath = getFilePath(serviceRequest);
         transaction.setInvoice(filePath);
         transaction.setServiceRequest(serviceRequest);
 
