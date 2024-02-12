@@ -23,6 +23,7 @@ import java.util.*;
 
 @Service
 public class ServiceService implements IServiceService {
+
     private final ServiceRepository serviceRepository;
     private final CategoryRepository categoryRepository;
     private final ServiceRequestRepository serviceRequestRepository;
@@ -53,15 +54,17 @@ public class ServiceService implements IServiceService {
             service.setCategory(category);
             serviceRepository.save(service);
             return Mapper.fromServiceToDto(service);
+
         } else {
-            throw new BadRequestException("ServiceCategory or category ID is null in the input DTO");
+            throw new RecordNotFoundException("ServiceCategory or category ID is null in the input DTO");
         }
     }
 
     @Override
     public List<ServiceOutputDto> getAllService() {
+
         List<nl.novi.serviceconnect.models.Service> serviceList = serviceRepository.findAll();
-        List<ServiceOutputDto> serviceOutputDtos = new ArrayList<>();
+        List<ServiceOutputDto> serviceOutputDto = new ArrayList<>();
 
         if (serviceList.isEmpty()) {
             throw new RecordNotFoundException("No services found");
@@ -70,10 +73,10 @@ public class ServiceService implements IServiceService {
         serviceList.sort(Comparator.comparing(nl.novi.serviceconnect.models.Service::getId));
 
         for(nl.novi.serviceconnect.models.Service service : serviceList) {
-            serviceOutputDtos.add(Mapper.fromServiceToDto(service));
+            serviceOutputDto.add(Mapper.fromServiceToDto(service));
         }
 
-        return serviceOutputDtos;
+        return serviceOutputDto;
     }
 
     @Override
@@ -96,17 +99,6 @@ public class ServiceService implements IServiceService {
         return Mapper.fromServiceToDto(result);
     }
 
-    private nl.novi.serviceconnect.models.Service updateServiceFields(nl.novi.serviceconnect.models.Service service, ServiceInputDto serviceInputDto) {
-
-        return new nl.novi.serviceconnect.models.Service (
-                service.getId(),
-                StringHelpers.isNotNullOrEmpty(serviceInputDto.getName()) ? serviceInputDto.getName() : service.getName(),
-                StringHelpers.isNotNullOrEmpty(serviceInputDto.getDescription()) ? serviceInputDto.getDescription() : service.getDescription(),
-                (serviceInputDto.getPrice() != null && serviceInputDto.getPrice() != 0.0) ? serviceInputDto.getPrice() : service.getPrice(),
-                StringHelpers.isNotNullOrEmpty(String.valueOf(serviceInputDto.getState())) ? serviceInputDto.getState() : service.getState(),
-                serviceInputDto.getCategory() != null ? serviceInputDto.getCategory() : service.getCategory()
-        );
-    }
     @Override
     public void deleteService(Long id) {
         Optional<nl.novi.serviceconnect.models.Service> optionalService = serviceRepository.findById(id);
@@ -142,5 +134,17 @@ public class ServiceService implements IServiceService {
         }
         serviceRequestRepository.save(serviceRequestResult);
         return Mapper.fromServiceRequestToDto(serviceRequestResult);
+    }
+
+    private nl.novi.serviceconnect.models.Service updateServiceFields(nl.novi.serviceconnect.models.Service service, ServiceInputDto serviceInputDto) {
+
+        return new nl.novi.serviceconnect.models.Service (
+                service.getId(),
+                StringHelpers.isNotNullOrEmpty(serviceInputDto.getName()) ? serviceInputDto.getName() : service.getName(),
+                StringHelpers.isNotNullOrEmpty(serviceInputDto.getDescription()) ? serviceInputDto.getDescription() : service.getDescription(),
+                (serviceInputDto.getPrice() != null && serviceInputDto.getPrice() != 0.0) ? serviceInputDto.getPrice() : service.getPrice(),
+                StringHelpers.isNotNullOrEmpty(String.valueOf(serviceInputDto.getState())) ? serviceInputDto.getState() : service.getState(),
+                serviceInputDto.getCategory() != null ? serviceInputDto.getCategory() : service.getCategory()
+        );
     }
 }

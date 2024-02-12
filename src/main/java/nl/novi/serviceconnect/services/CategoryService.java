@@ -67,14 +67,6 @@ public class CategoryService implements IServiceCategory {
         return Mapper.fromCategoryToDto(existingCategory);
     }
 
-    private void updateCategoryFields(ServiceCategory category, ServiceCategoryInputDto inputDto) {
-        if (Helpers.isNotNullOrEmpty(inputDto.getName())) {
-            category.setName(inputDto.getName());
-        }
-        if (Helpers.isNotNullOrEmpty(inputDto.getDescription())) {
-            category.setDescription(inputDto.getDescription());
-        }
-    }
     @Override
     public void deleteCategory(Long id) {
         Optional<ServiceCategory> optionalServiceCategory = categoryRepository.findById(id);
@@ -83,6 +75,15 @@ public class CategoryService implements IServiceCategory {
             throw new RecordNotFoundException("Service with id " + id + " not found");
         } else {
             categoryRepository.deleteById(id);
+        }
+    }
+
+    private void updateCategoryFields(ServiceCategory category, ServiceCategoryInputDto inputDto) {
+        if (Helpers.isNotNullOrEmpty(inputDto.getName())) {
+            category.setName(inputDto.getName());
+        }
+        if (Helpers.isNotNullOrEmpty(inputDto.getDescription())) {
+            category.setDescription(inputDto.getDescription());
         }
     }
 }

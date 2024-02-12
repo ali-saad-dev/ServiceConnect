@@ -30,11 +30,11 @@ INSERT INTO service_request (service_id, message, request_State,user_name) VALUE
 (6, 'Require legal consultation for a real estate matter. Please advise on availability.', 'Pending', 'user');
 
 --transaction table
-INSERT INTO transaction (service_request_id, transaction_date, is_payed, invoice) VALUES (1, '2024-01-15', true, 'invoicesPdf\invoice_1707211320385.pdf'),
- (2, '2024-01-16', true, 'invoicesPdf\invoice_1707211384761.pdf'),
- (3, '2024-01-17', true, 'invoicesPdf\invoice_1707211545604.pdf'),
- (4, '2024-01-18', false, 'invoicesPdf\invoice_1707211563784.pdf'),
- (5, '2024-01-19', true, 'invoicesPdf\invoice_1707211579981.pdf'),
- (6, '2024-01-20', false, 'invoicesPdf\invoice_1707211636003.pdf');
+INSERT INTO transaction (service_request_id, transaction_date, is_payed, invoice) VALUES (1, '2024-01-15', true, 'invoicesPdf\invoice-1.pdf'),
+ (2, '2024-01-16', true, 'invoicesPdf\invoice-2.pdf'),
+ (3, '2024-01-17', true, 'invoicesPdf\invoice-3.pdf'),
+ (4, '2024-01-18', false, 'invoicesPdf\invoice-4.pdf'),
+ (5, '2024-01-19', true, 'invoicesPdf\invoice-5.pdf'),
+ (6, '2024-01-20', false, 'invoicesPdf\invoice-6.pdf');
 
 
