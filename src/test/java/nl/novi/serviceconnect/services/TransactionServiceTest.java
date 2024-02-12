@@ -54,14 +54,18 @@ public class TransactionServiceTest {
     public void shouldGetFilePath_Success() {
         //Arrange
         String fileSeparator = File.separator;
-        String expectedFilePathPrefix = "invoicesPdf" + fileSeparator + "invoice_";
+        ServiceRequest serviceRequest = mock(ServiceRequest.class);
+        when(serviceRequest.getId()).thenReturn(1L);
+        String expectedFilePath = "invoicesPdf" + fileSeparator + "invoice-" + serviceRequest.getId()+ ".pdf";
+
 
         //Act
-        String filePath = transactionService.getFilePath();
+        String filePath = transactionService.getFilePath(serviceRequest);
 
 
         //Assert
-        assertTrue(filePath.startsWith(expectedFilePathPrefix), "File path should start with: " + expectedFilePathPrefix);
+        assertEquals(expectedFilePath, filePath);
+        assertTrue(filePath.startsWith(expectedFilePath), "File path should start with: " + expectedFilePath);
     }
 
     @Test
