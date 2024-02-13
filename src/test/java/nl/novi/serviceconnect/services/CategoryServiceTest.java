@@ -1,10 +1,11 @@
 package nl.novi.serviceconnect.services;
 
-import nl.novi.serviceconnect.dtos.ServiceCategoryInputDto;
-import nl.novi.serviceconnect.dtos.ServiceCategoryOutputDto;
-import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
-import nl.novi.serviceconnect.models.ServiceCategory;
-import nl.novi.serviceconnect.repository.CategoryRepository;
+import nl.novi.serviceconnect.core.dtos.ServiceCategoryInputDto;
+import nl.novi.serviceconnect.core.dtos.ServiceCategoryOutputDto;
+import nl.novi.serviceconnect.core.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.infrastructure.models.ServiceCategory;
+import nl.novi.serviceconnect.core.services.CategoryService;
+import nl.novi.serviceconnect.infrastructure.repository.CategoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

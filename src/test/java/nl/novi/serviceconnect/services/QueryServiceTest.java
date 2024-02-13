@@ -1,12 +1,13 @@
 package nl.novi.serviceconnect.services;
 
-import nl.novi.serviceconnect.dtos.CategoryServiceCountDto;
-import nl.novi.serviceconnect.dtos.ServiceOutputDto;
-import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
-import nl.novi.serviceconnect.models.Service;
-import nl.novi.serviceconnect.models.ServiceState;
-import nl.novi.serviceconnect.repository.CategoryRepository;
-import nl.novi.serviceconnect.repository.ServiceRepository;
+import nl.novi.serviceconnect.core.dtos.CategoryServiceCountDto;
+import nl.novi.serviceconnect.core.dtos.ServiceOutputDto;
+import nl.novi.serviceconnect.core.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.infrastructure.models.Service;
+import nl.novi.serviceconnect.infrastructure.models.ServiceState;
+import nl.novi.serviceconnect.core.services.QueryService;
+import nl.novi.serviceconnect.infrastructure.repository.CategoryRepository;
+import nl.novi.serviceconnect.infrastructure.repository.ServiceRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

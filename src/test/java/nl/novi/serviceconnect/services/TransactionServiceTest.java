@@ -1,14 +1,15 @@
 package nl.novi.serviceconnect.services;
 
-import nl.novi.serviceconnect.dtos.TransactionInputDto;
-import nl.novi.serviceconnect.dtos.TransactionUpdateDto;
-import nl.novi.serviceconnect.dtos.TransactionOutputDto;
-import nl.novi.serviceconnect.exceptions.FileAlreadyUploadedException;
-import nl.novi.serviceconnect.exceptions.RecordNotFoundException;
-import nl.novi.serviceconnect.models.ServiceRequest;
-import nl.novi.serviceconnect.models.Transaction;
-import nl.novi.serviceconnect.repository.ServiceRequestRepository;
-import nl.novi.serviceconnect.repository.TransactionRepository;
+import nl.novi.serviceconnect.core.dtos.TransactionInputDto;
+import nl.novi.serviceconnect.core.dtos.TransactionUpdateDto;
+import nl.novi.serviceconnect.core.dtos.TransactionOutputDto;
+import nl.novi.serviceconnect.core.exceptions.FileAlreadyUploadedException;
+import nl.novi.serviceconnect.core.exceptions.RecordNotFoundException;
+import nl.novi.serviceconnect.infrastructure.models.ServiceRequest;
+import nl.novi.serviceconnect.infrastructure.models.Transaction;
+import nl.novi.serviceconnect.core.services.TransactionService;
+import nl.novi.serviceconnect.infrastructure.repository.ServiceRequestRepository;
+import nl.novi.serviceconnect.infrastructure.repository.TransactionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

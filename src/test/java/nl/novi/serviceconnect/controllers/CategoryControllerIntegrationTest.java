@@ -3,7 +3,7 @@ package nl.novi.serviceconnect.controllers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import nl.novi.serviceconnect.dtos.ServiceCategoryOutputDto;
+import nl.novi.serviceconnect.core.dtos.ServiceCategoryOutputDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
