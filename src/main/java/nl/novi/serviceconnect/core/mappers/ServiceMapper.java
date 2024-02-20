@@ -8,6 +8,7 @@ public class ServiceMapper {
 
     public static ServiceOutputDto fromServiceToDto(Service service){
         ServiceOutputDto dto = new ServiceOutputDto();
+        if(service == null) return null;
         dto.id = service.getId();
         dto.name = service.getName();
         dto.description = service.getDescription();
