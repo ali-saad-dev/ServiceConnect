@@ -5,5 +5,5 @@ public enum RequestState {
     Approved,
     Rejected,
     Deleted,
-    Completed;
+    Completed
 }
